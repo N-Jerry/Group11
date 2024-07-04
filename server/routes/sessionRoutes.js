@@ -16,4 +16,8 @@ router.post('/sessions/mark-attendance', sessionController.markAttendance);
 
 router.get('/sessions/report/:id', sessionController.generateAttendanceReport);
 
+router.get('/reports', sessionController.getReports);
+
+router.post('/reports/:_id', sessionController.exportReport);
+
 module.exports = router;

@@ -7,7 +7,9 @@ const sendNotification = async (req, res) => {
     const { userID, type, message } = req.body;
     try {
         const user = await User.findById(userID);
-        if (!user) {return res.status(404).json({ error: 'User not found' });}
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
 
         // Create a new notification
         const newNotification = new Notification({
@@ -32,26 +34,32 @@ const sendNotification = async (req, res) => {
 };
 
 // Method to mark a notification as read
-const markAsRead = async (notificationID) => {
+const markAsRead = async (req, res) => {
+    const { notificationID } = req.body;
     try {
         const notification = await Notification.findById(notificationID);
-        if (!notification) throw new Error('Notification not found');
+        if (!notification) {
+            return res.status(404).json({ error: 'Notification not found' });
+        }
 
         notification.read = true;
         await notification.save();
-        return notification;
+
+        // Respond with success message or updated notification
+        res.status(200).json({ message: 'Notification marked as read', notification });
     } catch (error) {
-        throw new Error(error.message);
+        res.status(400).json({ error: error.message });
     }
 };
 
 // Method to get notifications for a user
-const getUserNotifications = async (userID) => {
+const getUserNotifications = async (req, res) => {
+    const { userID } = req.params;
     try {
         const notifications = await Notification.find({ user: userID }).sort({ timestamp: -1 });
-        return notifications;
+        res.status(200).json({ notifications });
     } catch (error) {
-        throw new Error(error.message);
+        res.status(400).json({ error: error.message });
     }
 };
 

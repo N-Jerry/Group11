@@ -1,6 +1,9 @@
 //use .env
 require('dotenv').config()
 
+//schuders
+require('./schedulers/isSessionCreated')
+
 //port and connnection string fron .env
 const PORT = process.env.PORT;
 

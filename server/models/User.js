@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcrypt');
 const Course = require('./Course')
+const Setting = require('./Setting')
 
 const userSchema = new mongoose.Schema({
     name: {
@@ -106,6 +107,14 @@ userSchema.statics.signup = async function (name, email, password, tel, userType
 
     //Create user
     const user = await this.create({ name, email, password: hash, tel, userType, studentId, instructorId, courseCodes, department });
+
+    // Create default settings for the user
+    const defaultSettings = {
+        user: user._id
+    };
+
+    await Setting.create(defaultSettings);
+
     return user;
 }
 
