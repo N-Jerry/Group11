@@ -12,14 +12,14 @@ const InstructorDashboardScreen: React.FC = () => {
   const router = useRouter();
   const [showNewSessionForm, setShowNewSessionForm] = useState(false);
 
-  const { user, users, logout } = useAuthContext();
+  const { user, users } = useAuthContext();
   const { sessions } = useSession();
   const { courses } = useCourseContext();
 
   const filteredCourses = courses.filter(course => user?.courseCodes?.includes(course.code));
   const totalCourses = filteredCourses.length;
 
-  const filteredSessions = sessions.filter(session => filteredCourses.some(course => course._id === session.course));
+  const filteredSessions = sessions.filter(session => filteredCourses.some(course => course._id === session.course._id));
   const sessionCount = filteredSessions.length;
 
   const filteredStudents = users?.filter(user => user.userType === 'student' && filteredCourses.some(course => user.courseCodes?.includes(course.code)));
@@ -60,8 +60,7 @@ const InstructorDashboardScreen: React.FC = () => {
         </View>
       ) : (
         <>
-          <Text style={styles.title}>Instructor Dashboard</Text>
-
+          <Text style={styles.title}>Welcome {user?.name}</Text>
           <View style={styles.cardContainer}>
             <Card title="Sessions" value={sessionCount} icon='calendar-outline' action={handleSessionsNavigation} />
             <Card title="Courses" value={totalCourses} icon='people-outline' action={handleCoursesNavigation} />

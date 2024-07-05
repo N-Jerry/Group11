@@ -2,9 +2,13 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { User } from '../types/index';
 import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Alert } from 'react-native'; // Import Alert for displaying errors
 
 const baseURL = 'http://localhost:5000/api';
+
+interface AuthResponse {
+  user: User;
+  token: string;
+}
 
 interface AuthContextProps {
   user: User | null;
@@ -35,8 +39,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const signup = async (userData: User) => {
     try {
-      const response = await axios.post<User>(`${baseURL}/auth/signup`, userData);
-      setUser(response.data);
+      const response = await axios.post<AuthResponse>(`${baseURL}/auth/signup`, userData);
+      setUser(response.data.user);
       AsyncStorage.setItem('user', JSON.stringify(response.data));
     } catch (error) {
       console.error('Error during signup:', error);
@@ -46,8 +50,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
   const signin = async (email: string, password: string) => {
     try {
-      const response = await axios.post<User>(`${baseURL}/auth/login`, { email, password });
-      setUser(response.data);
+      const response = await axios.post<AuthResponse>(`${baseURL}/auth/login`, { email, password });
+      setUser(response.data.user);
+      console.log(user)
       AsyncStorage.setItem('user', JSON.stringify(response.data));
     } catch (error) {
       console.error('Error during signup:', error);
@@ -61,8 +66,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         throw new Error('No user is currently logged in');
       }
 
-      const response = await axios.patch<User>(`${baseURL}/auth/update/${user._id}`, userData);
-      const updatedUser = { ...user, ...userData, ...response.data };
+      const response = await axios.patch<AuthResponse>(`${baseURL}/auth/update/${user._id}`, userData);
+      const updatedUser = { ...user, ...userData, ...response.data.user };
       setUser(updatedUser);
       AsyncStorage.setItem('user', JSON.stringify(updatedUser));
     } catch (error) {
@@ -87,7 +92,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       try {
         const storedUser = await AsyncStorage.getItem('user');
         if (storedUser) {
-          setUser(JSON.parse(storedUser));
+          setUser(JSON.parse(storedUser).user);
+          console.log("fetch user", user)
         }
       } catch (error) {
         console.error('Error fetching user from AsyncStorage:', error);

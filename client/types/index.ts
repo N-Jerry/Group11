@@ -37,8 +37,15 @@ export interface Session {
     date: Date;
     deadline: Date;
     location: string;
-    course: string;
+    course: Partial<Course>;
     records: Record[];
+}
+
+export interface SessionC {
+    date?: Date;
+    deadline?: Date;
+    location?: string;
+    course: string;
 }
 
 export interface Parameter<K extends string = string, T = any> {

@@ -7,9 +7,11 @@ import FormDropdown from '@/components/FormDropdown';
 import CustomButton from '@/components/CustomButton';
 import MultiSelect from '@/components/FormMultiSelect';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useCourseContext } from '@/contexts/CourseContext';
 
 const SignUpScreen = () => {
     const { signup } = useAuthContext()
+    const { courses } = useCourseContext()
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
@@ -134,11 +136,10 @@ const SignUpScreen = () => {
                             title="Courses"
                             selectedValues={selectedCourses}
                             onValueChange={setSelectedCourses}
-                            items={[
-                                { label: 'Course 1', value: 'course1' },
-                                { label: 'Course 2', value: 'course2' },
-                                { label: 'Course 3', value: 'course3' },
-                            ]}
+                            items={courses?.map(course => ({
+                                label: course.code,
+                                value: course.code
+                            }))}
                         />
                         <CustomButton
                             title={'Register'}

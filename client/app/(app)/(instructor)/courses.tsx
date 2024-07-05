@@ -81,7 +81,7 @@ const CoursesScreen: React.FC = () => {
 
           <View style={styles.cards}>
             {coursesByLevel.map((course, index) => {
-              const sessionCount = sessions.filter(session => session.course === course._id).length;
+              const sessionCount = sessions.filter(session => session.course._id === course._id).length;
               return (
                 <CustomCard key={index} title={course.title} containerStyle={styles.courseCard}>
                   <Text style={styles.courseSessions}>{sessionCount} Sessions</Text>
