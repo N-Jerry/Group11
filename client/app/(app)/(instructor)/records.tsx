@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import CustomCard from '../../components/CustomCard';
-import CustomButton from '../../components/CustomButton2';
+import CustomCard from '../../../components/CustomCard';
+import CustomButton from '../../../components/CustomButton2';
 import NewSessionForm from '@/components/NewSession';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useSession } from '@/contexts/sessionContext';
+import { useSession } from '@/contexts/SessionContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 
 const SessionsScreen: React.FC = () => {

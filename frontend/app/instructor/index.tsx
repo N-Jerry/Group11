@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import Card from '../../components/Card';
-import Chart from '../../components/Chart';
 import NewSessionForm from '@/components/NewSession';
-import LineChartComponent from '@/components/LineChart';
 import { useRouter } from 'expo-router';
 import { AuthProvider, useAuthContext } from '@/contexts/AuthContext';
-import { DataProvider, useDataContext } from '@/contexts/DataContext';
+import { SessionProvider, useSession } from '@/contexts/sessionContext';
+import { CourseProvider, useCourseContext } from '@/contexts/CourseContext';
 
 const InstructorDashboardScreen: React.FC = () => {
   const router = useRouter()
   const [showNewSessionForm, setShowNewSessionForm] = useState(false);
 
-  const { user } = useAuthContext();
-  const { courses, coursesLoading, sessions, sessionsLoading, users, usersLoading } = useDataContext();
+  const { user, users } = useAuthContext();
+  const { sessions } = useSession();
+  const { courses } = useCourseContext();
 
-  const filteredCourses = courses.filter(course => user?.courseIds?.includes(course.courseId))
+  const filteredCourses = courses.filter(course => user?.courseCodes?.includes(course.code))
   const totalCourses = filteredCourses.length;
 
-  const filteredSessions = sessions.filter(session => filteredCourses.some(course => course.courseId === session.courseId));
+  const filteredSessions = sessions.filter(session => filteredCourses.some(course => course._id === session.course));
   const sessionCount = filteredSessions.length;
 
-  const filteredStudents = users.filter(user => user.userType === 'student' && filteredCourses.some(course => user.courseIds.includes(course.courseId)));
-  const totalStudents = filteredStudents.length;
-  
+  const filteredStudents = users?.filter(user => user.userType === 'student' && filteredCourses.some(course => user.courseCodes?.includes(course.code)));
+  const totalStudents = filteredStudents?.length || 0;;
+
   useEffect(() => {
     if (!user) {
       router.push('/');
     } else if (user.userType !== 'instructor') {
       router.push('/auth/signin');
-    } else if (!user.courseIds || user.courseIds.length === 0) {
+    } else if (!user.courseCodes || user.courseCodes?.length === 0) {
       router.push('auth/enrollment');
     }
   }, [user])
@@ -82,33 +82,29 @@ const InstructorDashboardScreen: React.FC = () => {
 
   return (
     <AuthProvider>
-      <DataProvider>
-        <ScrollView style={styles.container}>
-          {showNewSessionForm ? (
-            <View style={styles.chartContainer}>
-              <Text style={styles.title}>Confirm New Session</Text>
-              <NewSessionForm selectedCourse={filteredCourses[0]} onClose={handleCloseNewSessionForm} isLoading={coursesLoading} />
-            </View>) :
-            (<>
-              <Text style={styles.title}>Instructor Dashboard</Text>
-
-              <View style={styles.cardContainer}>
-                <Card title="Sessions" value={sessionCount} icon='calendar-outline' action={handleSessionsNavigation} />
-                <Card title="Courses" value={totalCourses} icon='people-outline' action={handleCoursesNavigation} />
-                <Card title="Students" value={totalStudents} icon='book-outline' />
-                <Card title="New Sessions" value={1} icon='add-outline' action={handleNewSession} />
-              </View>
-
-              {/* Bar Chart component */}
+      <CourseProvider>
+        <SessionProvider>
+          <ScrollView style={styles.container}>
+            {showNewSessionForm ? (
               <View style={styles.chartContainer}>
-                <Chart />
-                <LineChartComponent chartConfig={chartConfig} chartData={chartData} />
-              </View>
-            </>)
-          }
-        </ScrollView>
-      </DataProvider>
-    </AuthProvider>
+                <Text style={styles.title}>Confirm New Session</Text>
+                <NewSessionForm selectedCourse={filteredCourses[0]} onClose={handleCloseNewSessionForm} isLoading={!courses} />
+              </View>) :
+              (<>
+                <Text style={styles.title}>Instructor Dashboard</Text>
+
+                <View style={styles.cardContainer}>
+                  <Card title="Sessions" value={sessionCount} icon='calendar-outline' action={handleSessionsNavigation} />
+                  <Card title="Courses" value={totalCourses} icon='people-outline' action={handleCoursesNavigation} />
+                  <Card title="Students" value={totalStudents} icon='book-outline' />
+                  <Card title="New Sessions" value={1} icon='add-outline' action={handleNewSession} />
+                </View>
+              </>)
+            }
+          </ScrollView>
+        </SessionProvider>
+      </CourseProvider>
+    </AuthProvider >
   );
 };
 

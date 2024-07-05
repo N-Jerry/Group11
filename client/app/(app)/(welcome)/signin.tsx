@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import FormField from '../../components/FormField';
-import CustomButton from '../../components/CustomButton';
+import FormField from '@/components/FormField';
+import CustomButton from '@/components/CustomButton';
 
 const SignInScreen = () => {
   const router = useRouter();
@@ -34,7 +34,7 @@ const SignInScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/images/react-logo.png')} style={styles.logo} />
+      <Image source={require('@/assets/images/react-logo.png')} style={styles.logo} />
       <Text style={styles.welcomeText}>Welcome Back</Text>
       <Text style={styles.loginPrompt}>Login to continue</Text>
       <FormField
@@ -59,7 +59,7 @@ const SignInScreen = () => {
       />
       <Text style={styles.orText}>Or</Text>
       <TouchableOpacity style={styles.googleButton}>
-        <Image source={require('../../assets/images/react-logo.png')} style={styles.googleIcon} />
+        <Image source={require('@/assets/images/react-logo.png')} style={styles.googleIcon} />
       </TouchableOpacity>
       <Text style={styles.footerText}>
         Don't have an account?{' '}
