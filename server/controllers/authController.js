@@ -80,19 +80,4 @@ const updateProfile = async (req, res) => {
   }
 }
 
-const deletePerformanceUsers = async (req, res) => {
-  try {
-    // Find users whose email includes the word 'performance'
-    const usersToDelete = await User.find({ name: { $regex: 'Performance', $options: 'i' } });
-
-    // Delete the found users
-    const deletionResult = await User.deleteMany({ _id: { $in: usersToDelete.map(user => user._id) } });
-
-    res.status(200).json({ message: `Deleted ${deletionResult.deletedCount} users with email including 'performance'` });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-}
-
-module.exports = { getAllUsers, loginUser, signupUser, updateProfile, deletePerformanceUsers };
+module.exports = { getAllUsers, loginUser, signupUser, updateProfile };

@@ -1,3 +1,5 @@
+// components/DashboardContainer.tsx
+
 import React, { ReactNode } from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 
