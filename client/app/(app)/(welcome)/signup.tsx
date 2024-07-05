@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as LocalAuthentication from 'expo-local-authentication';
 import { User } from '@/types';
 import FormField from '@/components/FormField';
 import FormDropdown from '@/components/FormDropdown';
 import CustomButton from '@/components/CustomButton';
 import MultiSelect from '@/components/FormMultiSelect';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 const SignUpScreen = () => {
-    const signup = () => {
-        alert("signing up")
-    }
+    const { signup } = useAuthContext()
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
@@ -23,44 +21,7 @@ const SignUpScreen = () => {
     const [department, setDepartment] = useState('');
     const [identifier, setIdentifier] = useState('');
     const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-    const [fingerprintData, setFingerprintData] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [progress, setProgress] = useState(0);
-
-    useEffect(() => {
-        if (step === 3 && userType === 'student') {
-            handleEnroll();
-        }
-    }, [step]);
-
-    const handleEnroll = async () => {
-        setIsLoading(true);
-        const hasHardware = await LocalAuthentication.hasHardwareAsync();
-        const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-
-        if (hasHardware && !isEnrolled) {
-            try {
-                const result = await LocalAuthentication.authenticateAsync({
-                    promptMessage: 'Authenticate',
-                    cancelLabel: 'Cancel',
-                    fallbackLabel: 'Use Passcode',
-                });
-                if (result.success) {
-                    setProgress(100);
-                    Alert.alert('Success', 'Fingerprint authenticated successfully.');
-                    setFingerprintData(`${identifier}_fingerprint`);
-                } else {
-                    Alert.alert('Failed', 'Fingerprint authentication failed.');
-                }
-            } catch (error) {
-                Alert.alert('Error', 'An error occurred during fingerprint authentication.');
-            }
-        } else {
-            Alert.alert('Unavailable', 'Biometric authentication is not available or already enrolled.');
-        }
-
-        setIsLoading(false);
-    };
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -81,15 +42,13 @@ const SignUpScreen = () => {
                 instructorId: userType === 'instructor' ? identifier : undefined,
                 courseCodes: selectedCourses,
                 department,
-                biometrics: userType === 'student' ? fingerprintData : undefined,
             };
 
-            //await signup(newUser);
-            await signup();
+            await signup(newUser);
             router.push(`${userType === 'student' ? '/dashboard' : '/instructor'}`);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error during signup:', error);
-            alert('Signup failed. Please try again.');
+            alert(`Signin failed: ${error.response?.data?.error || 'Please try again'}.`);
         } finally {
             setIsLoading(false);
         }
@@ -182,27 +141,8 @@ const SignUpScreen = () => {
                             ]}
                         />
                         <CustomButton
-                            title={userType === 'student' ? 'Next' : 'Register'}
-                            handlePress={() => userType === 'student' ? setStep(3) : handleSignUp()}
-                            isLoading={isLoading}
-                        />
-                    </View>
-                );
-            case 3:
-                return (
-                    <View>
-                        <Text style={styles.title}>Enroll Fingerprint</Text>
-                        <Text style={styles.description}>{progress}% scanning...</Text>
-                        <TouchableOpacity onPress={handleEnroll}>
-                            <View style={styles.fingerprint}>
-                                <Text style={styles.fingerprintText}>
-                                    Place your finger on your fingerprint sensor to enroll
-                                </Text>
-                            </View>
-                        </TouchableOpacity>
-                        <CustomButton
-                            title="Register"
-                            handlePress={handleSignUp}
+                            title={'Register'}
+                            handlePress={() => handleSignUp()}
                             isLoading={isLoading}
                         />
                     </View>
@@ -222,7 +162,7 @@ const SignUpScreen = () => {
                 {renderStepContent()}
                 <Text style={styles.footerText}>
                     Already have an account?{' '}
-                    <Text onPress={() => router.push('/(welcome)/signin')} style={styles.footerLink}>
+                    <Text onPress={() => router.push('/signin')} style={styles.footerLink}>
                         Login
                     </Text>
                 </Text>

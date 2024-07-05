@@ -12,7 +12,7 @@ const InstructorDashboardScreen: React.FC = () => {
   const router = useRouter();
   const [showNewSessionForm, setShowNewSessionForm] = useState(false);
 
-  const { user, users } = useAuthContext();
+  const { user, users, logout } = useAuthContext();
   const { sessions } = useSession();
   const { courses } = useCourseContext();
 

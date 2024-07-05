@@ -1,5 +1,5 @@
 const origins = [
-    'http://localhost:3000',
+    'http://localhost:8081',
 ]
 
 const corsOptions = {

@@ -17,8 +17,8 @@ export default function AppLayout() {
       try {
         await SplashScreen.preventAutoHideAsync();
         if (fontsLoaded) {
-          await SplashScreen.hideAsync();
           setSplashReady(true);
+          await SplashScreen.hideAsync();
         }
       } catch (error) {
         console.error('Error preparing app:', error);
@@ -34,7 +34,7 @@ export default function AppLayout() {
 
   return (
     <Stack>
-      <Stack.Screen name="(welcome)" options={{ headerShown: false }} />
+      <Stack.Screen name="(welcome)/index" options={{ headerShown: false }} />
       <Stack.Screen name="+not-found" />
     </Stack>
   );

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { Course } from '../types/index';
+import { Course } from '../types';
 import useAxios from '../hooks/useAxios';
 
 interface CourseContextProps {
@@ -15,42 +15,40 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
     const [courses, setCourses] = useState<Course[]>([]);
 
     const fetchCourses = async () => {
-        try {
-            const response = await useAxios<Course[]>('main/courses', {
-                method: 'GET'
-            });
-            setCourses(response.data || []);
-        } catch (error) {
+        const { response, error, loading } = useAxios<Course[]>('main/courses', { method: 'GET' });
+        if (loading) return;
+        if (error) {
             console.error('Error fetching courses:', error);
+            return;
         }
+        setCourses(response?.data || []);
     };
 
     const createCourse = async (courseData: Course) => {
-        try {
-            const response = await useAxios<Course>('main/courses', {
-                method: 'POST',
-                data: courseData
-            });
-            if (response.data) {
-                setCourses([...courses, response.data]);
-            }
-        } catch (error) {
+        const { response, error, loading } = useAxios<Course>('main/courses', {
+            method: 'POST',
+            data: courseData
+        });
+        if (loading) return;
+        if (error) {
             console.error('Error creating course:', error);
+            return;
+        }
+        if (response?.data) {
+            setCourses([...courses, response.data]);
         }
     };
 
     const deleteCourse = async (id: string) => {
-        try {
-            await useAxios(`main/courses/${id}`, {
-                method: 'DELETE'
-            });
-            setCourses(courses.filter(course => course._id !== id));
-        } catch (error) {
+        const { response, error, loading } = useAxios<void>(`main/courses/${id}`, { method: 'DELETE' });
+        if (loading) return;
+        if (error) {
             console.error('Error deleting course:', error);
+            return;
         }
+        setCourses(courses.filter(course => course._id !== id));
     };
 
-    // Fetch courses on initial load
     useEffect(() => {
         fetchCourses();
     }, []);
@@ -64,7 +62,7 @@ export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) 
 
 export const useCourseContext = () => {
     const context = useContext(CourseContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error('useCourseContext must be used within a CourseProvider');
     }
     return context;

@@ -23,106 +23,96 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const [reports, setReports] = useState<Report[]>([]);
 
     const getSessions = async () => {
-        try {
-            const response = await useAxios<Session[]>('main/sessions', { method: 'GET' });
+        const { response, error } = useAxios<Session[]>('main/sessions', { method: 'GET' });
+        if (response) {
             setSessions(response.data || []);
-        } catch (error) {
+        } else {
             console.error('Error fetching sessions:', error);
         }
     };
 
     const getSessionById = async (id: string): Promise<Session | null> => {
-        try {
-            const response = await useAxios<Session>(`main/sessions/${id}`, { method: 'GET' });
+        const { response, error } = useAxios<Session>(`main/sessions/${id}`, { method: 'GET' });
+        if (response) {
             return response.data;
-        } catch (error) {
+        } else {
             console.error('Error fetching session by ID:', error);
             return null;
         }
     };
 
     const createSession = async (sessionData: Partial<Session>) => {
-        try {
-            const response = await useAxios<Session>('main/sessions', {
-                method: 'POST',
-                data: sessionData,
-            });
-            if (response.data) {
-                setSessions([...sessions, response.data]);
-            }
-        } catch (error) {
+        const { response, error } = useAxios<Session>('main/sessions', {
+            method: 'POST',
+            data: sessionData,
+        });
+        if (response) {
+            setSessions([...sessions, response.data]);
+        } else {
             console.error('Error creating session:', error);
         }
     };
 
     const updateSession = async (id: string, sessionData: Partial<Session>) => {
-        try {
-            const response = await useAxios<Session>(`main/sessions/${id}`, {
-                method: 'PUT',
-                data: sessionData,
-            });
-
-            if (response.data) {
-                setSessions(sessions.map(session => (session._id === id ? response.data! : session)));
-            } else {
-                console.error('Error updating session: No data returned');
-            }
-        } catch (error) {
+        const { response, error } = useAxios<Session>(`main/sessions/${id}`, {
+            method: 'PUT',
+            data: sessionData,
+        });
+        if (response) {
+            setSessions(sessions.map(session => (session._id === id ? response.data : session)));
+        } else {
             console.error('Error updating session:', error);
         }
     };
 
-
-
     const deleteSession = async (id: string) => {
-        try {
-            await useAxios(`main/sessions/${id}`, { method: 'DELETE' });
+        const { error } = useAxios(`main/sessions/${id}`, { method: 'DELETE' });
+        if (!error) {
             setSessions(sessions.filter(session => session._id !== id));
-        } catch (error) {
+        } else {
             console.error('Error deleting session:', error);
         }
     };
 
     const markAttendance = async (sessionId: string, studentId: string) => {
-        try {
-            await useAxios(`main/sessions/mark-attendance`, {
-                method: 'POST',
-                data: { sessionId, studentId },
-            });
+        const { error } = useAxios(`main/sessions/mark-attendance`, {
+            method: 'POST',
+            data: { sessionId, studentId },
+        });
+        if (!error) {
             getSessions(); // Refresh sessions
-        } catch (error) {
+        } else {
             console.error('Error marking attendance:', error);
         }
     };
 
     const generateAttendanceReport = async (reportData: any) => {
-        try {
-            const response = await useAxios<Report>('main/sessions/report', {
-                method: 'POST',
-                data: reportData,
-            });
-            setReports([...reports, response.data!]);
-        } catch (error) {
+        const { response, error } = useAxios<Report>('main/sessions/report', {
+            method: 'POST',
+            data: reportData,
+        });
+        if (response) {
+            setReports([...reports, response.data]);
+        } else {
             console.error('Error generating attendance report:', error);
         }
     };
 
     const getReports = async () => {
-        try {
-            const response = await useAxios<Report[]>('main/reports', { method: 'GET' });
-            setReports(response.data!);
-        } catch (error) {
+        const { response, error } = useAxios<Report[]>('main/reports', { method: 'GET' });
+        if (response) {
+            setReports(response.data);
+        } else {
             console.error('Error fetching reports:', error);
         }
     };
 
     const exportReport = async (reportId: string, exportType: 'pdf' | 'excel') => {
-        try {
-            await useAxios(`main/reports/${reportId}`, {
-                method: 'POST',
-                data: { exportType },
-            });
-        } catch (error) {
+        const { error } = useAxios(`main/reports/${reportId}`, {
+            method: 'POST',
+            data: { exportType },
+        });
+        if (error) {
             console.error('Error exporting report:', error);
         }
     };

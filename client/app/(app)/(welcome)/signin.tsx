@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import FormField from '@/components/FormField';
 import CustomButton from '@/components/CustomButton';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 const SignInScreen = () => {
   const router = useRouter();
-  const signin = () => {
-    alert("Signing in")
-  }
+  const { signin } = useAuthContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -17,19 +16,18 @@ const SignInScreen = () => {
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
-      //await signin(email, 'instructor', password); // Assuming userType 'student' for simplicity
-      await signin(); // Assuming userType 'student' for simplicity
+      await signin(email, password); 
       router.push('instructor'); // Navigate to the home screen after successful sign-in
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error during sign-in:', error);
-      alert('Sign-in failed. Please try again.');
+      alert(`Signin failed: ${error.response?.data?.error || 'Please try again'}.`);
     } finally {
       setIsLoading(false);
     }
   };
 
   if (redirectToSignUp) {
-    router.push('(wekcome)/signup');
+    router.push('/signup');
   }
 
   return (

@@ -1,26 +1,27 @@
+import CustomButton from '@/components/CustomButton';
 import { router } from 'expo-router';
 import React from 'react';
-import { View, Text, Image, Button, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 const Onboarding = () => {
   return (
     <Swiper style={styles.wrapper} showsButtons={true}>
       <View style={styles.slide}>
-        <Image source={require('../../assets/images/college.png')} style={styles.image} />
+        <Image source={require('@/assets/images/college.png')} style={styles.image} />
         <Text style={styles.title}>Atiu Tubo</Text>
         <Text style={styles.text}>Discover amazing features to enhance your experience.</Text>
       </View>
       <View style={styles.slide}>
-        <Image source={require('../../assets/images/Professor-pana.png')} style={styles.image} />
+        <Image source={require('@/assets/images/Professor-pana.png')} style={styles.image} />
         <Text style={styles.title}>Keep attendance</Text>
         <Text style={styles.text}>Streamline your attendance sessions .</Text>
       </View>
       <View style={styles.slide}>
-        <Image source={require('../../assets/images/std.png')} style={styles.image} />
+        <Image source={require('@/assets/images/std.png')} style={styles.image} />
         <Text style={styles.title}>Mark Attendance</Text>
         <Text style={styles.text}>Indicate your attendance by simply using your fingerprints.</Text>
-        <Button title="Finish" onPress={() => router.push('signup')} />
+        <CustomButton title="Get Started" handlePress={() => router.push('signup')} />
       </View>
     </Swiper>
   );

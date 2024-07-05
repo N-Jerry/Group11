@@ -1,21 +1,36 @@
-import { useEffect, useState } from 'react';
-import { AxiosRequestConfig, AxiosError } from 'axios';
-import axiosInstance from '../axiosInstance';
+import { useState, useEffect } from 'react';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 
-interface AxiosParams extends AxiosRequestConfig {}
+const baseURL = 'http://localhost:5000/api'
 
-function useAxios<T>(url: string, params: AxiosParams): { data: T | null, loading: boolean, error: AxiosError | null } {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+const useAxios = <T>(url: string, config: AxiosRequestConfig): { 
+  response: AxiosResponse<T> | null; 
+  error: AxiosError | null; 
+  loading: boolean;
+} => {
+  const [response, setResponse] = useState<AxiosResponse<T> | null>(null);
   const [error, setError] = useState<AxiosError | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const source = axios.CancelToken.source();
+
     const fetchData = async () => {
       try {
-        const response = await axiosInstance(url, params);
-        setData(response.data);
-      } catch (error) {
-        setError(error as AxiosError);
+        const res = await axios({
+          ...config,
+          url: baseURL + url,
+          cancelToken: source.token,
+        });
+        setResponse(res);
+        setError(null);
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log('Request canceled', (err as AxiosError).message);
+        } else {
+          setError(err as AxiosError);
+          setResponse(null);
+        }
       } finally {
         setLoading(false);
       }
@@ -23,13 +38,12 @@ function useAxios<T>(url: string, params: AxiosParams): { data: T | null, loadin
 
     fetchData();
 
-    // Cleanup function to cancel axios request if component unmounts or changes before request completes
     return () => {
-      // You might need to cancel the axios request here if needed
+      source.cancel('Operation canceled by the user.');
     };
-  }, [url, params]);
+  }, [url, config]);
 
-  return { data, loading, error };
-}
+  return { response, error, loading };
+};
 
 export default useAxios;

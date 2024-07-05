@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 
-SplashScreen.preventAutoHideAsync();
-
 const CustomSplashScreen = ({ onReady }: { onReady: () => void }) => {
   useEffect(() => {
-    setTimeout(onReady, 3000);
+    SplashScreen.preventAutoHideAsync();
+    const timer = setTimeout(() => {
+      onReady();
+      SplashScreen.hideAsync();
+    }, 3000);
+    return () => clearTimeout(timer);
   }, [onReady]);
 
   return (

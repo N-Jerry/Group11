@@ -34,7 +34,7 @@ const checkOngoingCourses = async () => {
 
             if (!sessionExists) {
                 // Send notification to the course instructor or relevant users
-                const instructor = await User.findById(course.instructor); // Assuming you have an instructor field in the course model
+                const instructor = await User.findOne({ courseCodes: course.code }); // Assuming you have an instructor field in the course model
                 const message = `Reminder: No session created for course ${course.title} (${course.code}) on ${dayOfWeek} at ${currentTime}`;
 
                 if (instructor) {
@@ -56,4 +56,4 @@ const checkOngoingCourses = async () => {
 };
 
 // Schedule the task to run every 5 minutes
-cron.schedule('*/1 * * * *', checkOngoingCourses);
+cron.schedule('*/50 * * * *', checkOngoingCourses);
