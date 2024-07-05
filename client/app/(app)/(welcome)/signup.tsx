@@ -215,7 +215,7 @@ const SignUpScreen = () => {
     return (
         <ScrollView contentContainerStyle={styles.scrollView}>
             <View style={styles.container}>
-                <Image source={require('../../assets/images/react-logo.png')} style={styles.logo} />
+                <Image source={require('@/assets/images/react-logo.png')} style={styles.logo} />
                 <View style={styles.progressContainer}>
                     <View style={[styles.progressBar, { width: `${(step / 3) * 100}%` }]} />
                 </View>

@@ -6,7 +6,7 @@ import { Course } from '@/types';
 import FormDropdown from './FormDropdown';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
-import { useSession } from '@/contexts/sessionContext';
+import { useSession } from '@/contexts/SessionContext';
 
 interface Item {
     label: string;
@@ -36,7 +36,7 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
         {label: "50mins", value: 50},   
     ];
 
-    const courseOptions: Item[] = courses.filter(c => c.instructorId === user?.instructorId).map(course => ({
+    const courseOptions: Item[] = courses.filter(c => user?.courseCodes?.includes(c.code)).map(course => ({
         label: course.code,
         value: course._id
     }));
@@ -68,7 +68,7 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
 
     return (
         <View style={styles.card}>
-            <Text style={styles.title}>New {selectedCourse.name} Session</Text>
+            <Text style={styles.title}>New {selectedCourse.title} Session</Text>
             <View style={styles.formFieldContainer}>
                 <FormDropdown
                     items={courseOptions}
