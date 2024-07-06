@@ -14,7 +14,7 @@ router.delete('/sessions/:id', sessionController.deleteSession);
 
 router.post('/sessions/mark-attendance', sessionController.markAttendance);
 
-router.get('/sessions/report/:id', sessionController.generateAttendanceReport);
+router.post('/sessions/report/:id', sessionController.generateAttendanceReport);
 
 router.get('/reports', sessionController.getReports);
 

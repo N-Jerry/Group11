@@ -9,45 +9,57 @@ import { useCourseContext } from '@/contexts/CourseContext';
 
 const StudentDashboardScreen = () => {
   const { user } = useAuthContext();
-  const { sessions } = useSession();
+  const { sessions, reports, generateAttendanceReport } = useSession();
   const { courses } = useCourseContext();
   const [ongoingSession, setOngoingSession] = useState<Session | null | undefined>(null);
 
   useEffect(() => {
-    findOngoingSession();
     if (!user || user.userType !== 'student') {
       router.push('signin');
     } else {
+      findOngoingSession();
+      FetchStudentHistory()
     }
-  }, []);
+  }, [user, sessions, courses]); // Ensure the dependencies are correct
 
   const findOngoingSession = () => {
+  
     if (user?.courseCodes && user.courseCodes.length > 0) {
       const now = new Date();
       const userCourses = courses.filter(c => user.courseCodes?.includes(c.code));
-
+  
       const ongoingSession = sessions.find(session => {
         const sessionDate = new Date(session.date);
         const sessionDeadline = new Date(session.deadline);
-
+    
         // Check if the session's course code is in user's enrolled courses
         const sessionCourseCode = session.course.code;
         const isUserEnrolledInCourse = userCourses.some(course => course.code === sessionCourseCode);
-
+  
         // Check if current date is within session date and deadline
-        const isSessionOngoing = now <= sessionDeadline;
-
+        const isSessionOngoing = now >= sessionDate && now <= sessionDeadline;
+    
         return isUserEnrolledInCourse && isSessionOngoing;
       });
-
+  
       setOngoingSession(ongoingSession); // Set state here instead of returning a string
     } else {
+      console.log('No course codes found for user'); // Debugging statement
       setOngoingSession(null); // Set state to null if no ongoing session
     }
   };
+  
+  const [loading, setLoading] = useState(false);
+  const FetchStudentHistory = async () => {
+    setLoading(true);
+    const reportData = { userId: user?._id };
+    const report = await generateAttendanceReport(reportData, user);
+    console.log("Report:", report)
+    setLoading(false);
+  };
 
   const handleCheckIn = () => {
-    router.navigate({ pathname: 'student/checkin', params: { sessionId: ongoingSession?._id }});
+    router.navigate({ pathname: 'student/checkin', params: { sessionId: ongoingSession?._id } });
   };
 
   return (

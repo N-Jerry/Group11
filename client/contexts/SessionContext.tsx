@@ -82,7 +82,7 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const generateAttendanceReport = async (reportData: any, user: User | undefined | null): Promise<Report> => {
         try {
-            const response = await axios.get<Report>(`${baseURL}/main/sessions/report/${user?._id}`, reportData);
+            const response = await axios.post<Report>(`${baseURL}/main/sessions/report/${user?._id}`, reportData);
             setReports([...reports, response.data]);
             return response.data;
         } catch (error) {
