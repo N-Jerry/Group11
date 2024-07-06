@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme'; // Adjust the path as per your file structure
 import { Colors } from '@/constants/Colors'; // Adjust the path as per your file structure
 import CustomButton from '@/components/CustomButton2'; // Adjust the path as per your file structure
@@ -72,10 +72,24 @@ const SettingsScreen: React.FC = () => {
         }
     };
 
-
+    // Function to toggle notification preferences
+    const toggleNotificationPreference = async (type: 'email' | 'sms' | 'push') => {
+        try {
+            const updatedPreferences: Partial<PersonalSettings> = {
+                notificationPreferences: {
+                    ...personalSettings?.notificationPreferences,
+                    [type]: !personalSettings?.notificationPreferences[type]
+                }
+            };
+            await handleUpdateSettings(updatedPreferences);
+        } catch (error) {
+            console.error(`Error toggling ${type} notification preference:`, error);
+            // Handle error (e.g., show error message)
+        }
+    };
 
     return (
-        <View style={styles.container}>
+        <ScrollView style={styles.container}>
             <View style={styles.header}>
                 <Text style={styles.headerText}>Settings</Text>
             </View>
@@ -93,35 +107,48 @@ const SettingsScreen: React.FC = () => {
             </View>
             <View style={styles.option}>
                 <Text style={styles.optionText}>Notification Preferences</Text>
-                <TouchableOpacity style={styles.arrow} onPress={() => handleUpdateSettings({
-                    notificationPreferences: {
-                        email: !personalSettings?.notificationPreferences.email,
-                        sms: !personalSettings?.notificationPreferences.sms,
-                        push: !personalSettings?.notificationPreferences.push
-                    }
-                })}>
+                <TouchableOpacity style={styles.arrow}>
                     <Text>➡️</Text>
                 </TouchableOpacity>
+                <View style={styles.subMenu}>
+                    <View style={styles.subOption}>
+                        <Text>Email</Text>
+                        <Switch
+                            trackColor={{ false: "#767577", true: Colors[colorScheme ?? 'light'].tint }}
+                            thumbColor={personalSettings?.notificationPreferences.email ? Colors[colorScheme ?? 'light'].tint : "#f4f3f4"}
+                            onValueChange={() => toggleNotificationPreference('email')}
+                            value={personalSettings?.notificationPreferences.email}
+                        />
+                    </View>
+                    <View style={styles.subOption}>
+                        <Text>SMS</Text>
+                        <Switch
+                            trackColor={{ false: "#767577", true: Colors[colorScheme ?? 'light'].tint }}
+                            thumbColor={personalSettings?.notificationPreferences.sms ? Colors[colorScheme ?? 'light'].tint : "#f4f3f4"}
+                            onValueChange={() => toggleNotificationPreference('sms')}
+                            value={personalSettings?.notificationPreferences.sms}
+                        />
+                    </View>
+                    <View style={styles.subOption}>
+                        <Text>Push</Text>
+                        <Switch
+                            trackColor={{ false: "#767577", true: Colors[colorScheme ?? 'light'].tint }}
+                            thumbColor={personalSettings?.notificationPreferences.push ? Colors[colorScheme ?? 'light'].tint : "#f4f3f4"}
+                            onValueChange={() => toggleNotificationPreference('push')}
+                            value={personalSettings?.notificationPreferences.push}
+                        />
+                    </View>
+                </View>
             </View>
             <View style={styles.option}>
                 <Text style={styles.optionText}>Security Settings</Text>
-                <TouchableOpacity style={styles.arrow} onPress={() => handleUpdateSettings({
-                    securitySettings: {
-                        twoFactorAuth: personalSettings?.securitySettings.twoFactorAuth === 'enabled' ? 'disabled' : 'enabled',
-                        loginAlerts: personalSettings?.securitySettings.loginAlerts === 'enabled' ? 'disabled' : 'enabled'
-                    }
-                })}>
+                <TouchableOpacity style={styles.arrow}>
                     <Text>➡️</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.option}>
                 <Text style={styles.optionText}>Privacy Settings</Text>
-                <TouchableOpacity style={styles.arrow} onPress={() => handleUpdateSettings({
-                    privacySettings: {
-                        dataSharing: personalSettings?.privacySettings.dataSharing === 'enabled' ? 'disabled' : 'enabled',
-                        activityStatus: personalSettings?.privacySettings.activityStatus === 'visible' ? 'hidden' : 'visible'
-                    }
-                })}>
+                <TouchableOpacity style={styles.arrow}>
                     <Text>➡️</Text>
                 </TouchableOpacity>
             </View>
@@ -158,7 +185,7 @@ const SettingsScreen: React.FC = () => {
                 buttonStyle={styles.logoutButton}
                 textStyle={styles.logoutButtonText}
             />
-        </View>
+        </ScrollView>
     );
 };
 
@@ -197,6 +224,17 @@ const styles = StyleSheet.create({
     },
     arrow: {
         padding: 5,
+    },
+    subMenu: {
+        marginLeft: 20,
+        marginTop: 10,
+        marginBottom: 10,
+    },
+    subOption: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginBottom: 10,
     },
     logoutButton: {
         marginTop: 20,

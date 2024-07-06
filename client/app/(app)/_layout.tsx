@@ -55,7 +55,7 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
-        name="students"
+        name="student"
         options={{
           headerTitle: "Students",
           headerLeft: () => (
@@ -67,7 +67,7 @@ export default function AppLayout() {
         }}
       />
       <Stack.Screen
-        name="instructors"
+        name="instructor"
         options={{
           headerTitle: "Instructors",
           headerLeft: () => (

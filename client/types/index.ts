@@ -91,3 +91,12 @@ export interface PersonalSettings {
     securitySettings: SecuritySettings;
     privacySettings: PrivacySettings;
 }
+
+export interface Feedback {
+    _id?: string;
+    user: string;
+    message: string;
+    type: string;
+    status: string;
+    createdAt: Date;
+}

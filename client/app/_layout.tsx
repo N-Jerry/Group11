@@ -4,16 +4,19 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { CourseProvider } from '@/contexts/CourseContext';
 import { SessionProvider } from '@/contexts/SessionContext';
 import { Slot } from 'expo-router'; // Adjust this import as needed
+import { FeedbackProvider } from '@/contexts/FeedbackContext';
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AuthProvider>
         <CourseProvider>
           <SessionProvider>
-            <Slot />
+            <FeedbackProvider>
+              <Slot />
+            </FeedbackProvider>
           </SessionProvider>
         </CourseProvider>
       </AuthProvider>

@@ -14,12 +14,12 @@ const StudentDashboardScreen = () => {
   const [ongoingSession, setOngoingSession] = useState<Session | null | undefined>(null);
 
   useEffect(() => {
+    findOngoingSession();
     if (!user || user.userType !== 'student') {
       router.push('signin');
     } else {
-      findOngoingSession();
     }
-  }, [user]);
+  }, []);
 
   const findOngoingSession = () => {
     if (user?.courseCodes && user.courseCodes.length > 0) {
