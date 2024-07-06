@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import FormField from './FormField';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import FormDropdown from './FormDropdown';
 import CustomButton from './CustomButton';
 import { Course, SessionC } from '@/types';
-import FormDropdown from './FormDropdown';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 import { useSession } from '@/contexts/SessionContext';
+import * as Location from 'expo-location';
 
 interface Item {
     label: string;
@@ -23,10 +23,10 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
     const { courses } = useCourseContext();
     const { createSession } = useSession();
     const { user } = useAuthContext();
-    const [courseId, setCourseId] = useState(selectedCourse? selectedCourse._id : courses.find(c => user?.courseCodes?.includes(c.code))?._id);
+    const [courseId, setCourseId] = useState(selectedCourse ? selectedCourse._id : courses.find(c => user?.courseCodes?.includes(c.code))?._id);
     const [startInMinutes, setStartInMinutes] = useState(0);
     const [endInMinutes, setEndInMinutes] = useState(5);
-    const [location, setLocation] = useState('Default Room');
+    const [coords, setCoords] = useState<{ latitude: number, longitude: number } | null>(null);
 
     const timeOptions = [
         { label: "Now", value: 0 },
@@ -45,20 +45,47 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
         return new Date(Date.now() + minutes * 60000);
     };
 
+    const fetchLocation = async () => {
+        try {
+            let { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert("Permission Denied", "Location permission is required to create a session.");
+                return;
+            }
+
+            let location = await Location.getCurrentPositionAsync({});
+            setCoords({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude
+            });
+        } catch (error) {
+            console.error('Error fetching location:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchLocation();
+    }, []);
+
     const handleConfirm = async () => {
-        if(courseId){
+        if (!coords) {
+            alert("Location not available: Please enable location services.");
+            return;
+        }
+
+        if (courseId) {
             const date = calculateDate(startInMinutes);
             const deadline = calculateDate(startInMinutes + endInMinutes);
             const newSession: SessionC = {
                 date: date,
                 deadline: deadline,
-                location: location,
+                location: `Lat: ${coords.latitude}, Lon: ${coords.longitude}`,
                 course: courseId
             };
             await createSession(newSession);
             onClose();
         } else {
-            alert("Select a course First")
+            alert("Select a course First");
         }
     };
 
@@ -78,13 +105,7 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
                 />
             </View>
             <View style={styles.formFieldContainer}>
-                <FormField
-                    title="Location"
-                    value={location}
-                    handleChangeText={setLocation}
-                    placeholder='Hall'
-                    icon='location-icon'
-                />
+                <Text style={styles.locationText}>Location: {coords ? `Lat: ${coords.latitude}, Lon: ${coords.longitude}` : 'Fetching location...'}</Text>
             </View>
             <View style={styles.formFieldContainer}>
                 <FormDropdown
@@ -147,8 +168,9 @@ const styles = StyleSheet.create({
         width: '100%',
         marginBottom: 16,
     },
-    formField: {
-        width: '100%',
+    locationText: {
+        fontSize: 16,
+        color: '#333',
     },
     actions: {
         flexDirection: 'row',

@@ -169,7 +169,7 @@ const SettingsScreen: React.FC = () => {
             </View>
             <View style={styles.option}>
                 <Text style={styles.optionText}>Feedback</Text>
-                <TouchableOpacity style={styles.arrow}>
+                <TouchableOpacity style={styles.arrow} onPress={()=>router.push('settings/feedback')}>
                     <Text>➡️</Text>
                 </TouchableOpacity>
             </View>

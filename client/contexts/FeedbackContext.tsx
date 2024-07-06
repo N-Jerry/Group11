@@ -6,8 +6,8 @@ interface FeedbackContextProps {
     feedbacks: Feedback[];
     loading: boolean;
     error: string | null;
-    submitFeedback: (userID: string, message: string, type: string) => Promise<void>;
-    viewFeedback: (userID: string) => Promise<void>;
+    submitFeedback: (FeedbackData: SubmitFeedbackParams) => Promise<void>;
+    viewFeedback: (userID: string | undefined) => Promise<void>;
     getAllFeedbacks: () => Promise<void>;
     updateFeedbackStatus: (feedbackID: string, status: string) => Promise<void>;
 }
@@ -16,12 +16,18 @@ const FeedbackContext = createContext<FeedbackContextProps | undefined>(undefine
 
 const baseURL = 'http://localhost:5000/api/main'; // Adjust as per your backend API base URL
 
+interface SubmitFeedbackParams {
+    userID: string | undefined;
+    message: string;
+    type: string;
+}
+
 export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    const submitFeedback = async (userID: string, message: string, type: string) => {
+    const submitFeedback = async ({userID, message, type}: SubmitFeedbackParams) => {
         setLoading(true);
         try {
             const response = await axios.post<Feedback>(`${baseURL}/feedback`, { userID, message, type });
@@ -33,7 +39,7 @@ export const FeedbackProvider: React.FC<{ children: ReactNode }> = ({ children }
         }
     };
 
-    const viewFeedback = async (userID: string) => {
+    const viewFeedback = async (userID: string | undefined) => {
         setLoading(true);
         try {
             const response = await axios.get<Feedback[]>(`${baseURL}/feedbacks/${userID}`);

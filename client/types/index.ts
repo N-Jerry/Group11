@@ -98,5 +98,5 @@ export interface Feedback {
     message: string;
     type: string;
     status: string;
-    createdAt: Date;
+    timestamp: Date;
 }
