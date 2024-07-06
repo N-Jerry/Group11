@@ -85,18 +85,18 @@ const CoursesScreen: React.FC = () => {
               return (
                 <CustomCard key={index} title={course.title} containerStyle={styles.courseCard}>
                   <Text style={styles.courseSessions}>{sessionCount} Sessions</Text>
-                  <CustomButton
-                    title="More"
-                    onPress={() => handleViewSessions(course._id)}
-                    buttonStyle={styles.newSessionButton}
-                    textStyle={styles.newSessionButtonText}
-                  />
-                  <CustomButton
-                    title="New"
-                    onPress={() => handleNewSession(course)}
-                    buttonStyle={styles.newSessionButton}
-                    textStyle={styles.newSessionButtonText}
-                  />
+                    <CustomButton
+                      title="Details"
+                      onPress={() => handleViewSessions(course._id)}
+                      buttonStyle={styles.newSessionButton}
+                      textStyle={styles.newSessionButtonText}
+                    />
+                    <CustomButton
+                      title="+ Session"
+                      onPress={() => handleNewSession(course)}
+                      buttonStyle={styles.newSessionButton}
+                      textStyle={styles.newSessionButtonText}
+                    />
                 </CustomCard>
               )
             })}
@@ -157,6 +157,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   newSessionButton: {
+    margin: 5,
     backgroundColor: '#436cfc',
   },
   newSessionButtonText: {

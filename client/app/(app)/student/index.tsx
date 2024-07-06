@@ -115,7 +115,6 @@ const StudentDashboardScreen = () => {
                 <Text style={styles.sessionText}>{ongoingSession.course.code}</Text>
                 <Text style={styles.sessionText}>Started at {new Date(ongoingSession.date).toLocaleString()}</Text>
                 <Text style={styles.sessionText}>Ends at {new Date(ongoingSession.deadline).toLocaleString()}</Text>
-                <Text style={styles.sessionText}>In {ongoingSession.location}</Text>
               </View>
             ) : (
               <Text style={styles.errorText}>You are not within 100 meters of the session location. Please move closer.</Text>

@@ -8,7 +8,8 @@ export default function InstructorLayout() {
 
   return (
     <>
-        <Stack screenOptions={{ headerShown: false }}>
+        <Stack screenOptions={{ headerShown: true }}>
+            <Stack.Screen name="index" options={{ title: "Settings"}} />
             <Stack.Screen name="profile" options={{ title: "Profile"}} />
             <Stack.Screen name="feedback" options={{ title: "Feedback"}} />
         </Stack>
