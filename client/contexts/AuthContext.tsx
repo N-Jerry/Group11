@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
-import { User } from '../types/index';
+import { PersonalSettings, User } from '../types/index';
 import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -19,6 +19,8 @@ interface AuthContextProps {
   signin: (email: string, password: string) => Promise<void>;
   updateProfile: (userData: Partial<User>) => Promise<void>;
   getUsers: () => Promise<User[] | null | undefined>;
+  getPersonalSettings: () => Promise<PersonalSettings | null>;
+  updatePersonalSettings: (settings: Partial<PersonalSettings>) => Promise<PersonalSettings | null>;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -35,6 +37,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const logout = () => {
     setUser(null);
     AsyncStorage.removeItem('user');
+    alert("You are logout! Login To Continue")
   };
 
   const signup = async (userData: User) => {
@@ -47,7 +50,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       throw error;
     }
   };
-  
+
   const signin = async (email: string, password: string) => {
     try {
       const response = await axios.post<AuthResponse>(`${baseURL}/auth/login`, { email, password });
@@ -103,8 +106,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fetchUser();
   }, []);
 
+  const getPersonalSettings = async () => {
+    try {
+      if (!user) {
+        throw new Error('No user is currently logged in');
+      }
+
+      const response = await axios.get<PersonalSettings>(`${baseURL}/auth/settings/${user._id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching personal settings:', error);
+      return null;
+    }
+  };
+
+
+  // Function to update personal settings
+  const updatePersonalSettings = async (settings: Partial<PersonalSettings>) => {
+    try {
+      if (!user) {
+        throw new Error('No user is currently logged in');
+      }
+
+      await axios.put<PersonalSettings>(`${baseURL}/auth/settings/${user._id}`, settings);
+      // Assuming the API returns updated settings, you may handle them as needed
+      return await getPersonalSettings()
+    } catch (error) {
+      console.error('Error updating personal settings:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, users, login, logout, signup, signin, updateProfile, getUsers }}>
+    <AuthContext.Provider value={{ user, users, login, logout, signup, signin, getPersonalSettings, updatePersonalSettings, updateProfile, getUsers }}>
       {children}
     </AuthContext.Provider>
   );

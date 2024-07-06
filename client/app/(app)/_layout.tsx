@@ -1,10 +1,12 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 
 import CustomSplashScreen from '@/components/SplashScreen';
+import { TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AppLayout() {
   const [isSplashReady, setSplashReady] = useState(false);
@@ -32,10 +34,61 @@ export default function AppLayout() {
     return <CustomSplashScreen onReady={() => setSplashReady(true)} />;
   }
 
+  const renderHeaderRight = () => (
+    <TouchableOpacity onPress={() => router.push('/settings')}>
+      <Ionicons name="menu" size={24} color="black" />
+    </TouchableOpacity>
+  );
+
   return (
     <Stack>
-      <Stack.Screen name="(welcome)/index" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
+      <Stack.Screen
+        name="index"
+        options={{
+          headerTitle: "Home",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: renderHeaderRight,
+        }}
+      />
+      <Stack.Screen
+        name="students"
+        options={{
+          headerTitle: "Students",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: renderHeaderRight,
+        }}
+      />
+      <Stack.Screen
+        name="instructors"
+        options={{
+          headerTitle: "Instructors",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+          headerRight: renderHeaderRight,
+        }}
+      />
+      <Stack.Screen
+        name="settings"
+        options={{
+          headerTitle: "Settings",
+          headerLeft: () => (
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+          ),
+        }}
+      />
     </Stack>
   );
 }

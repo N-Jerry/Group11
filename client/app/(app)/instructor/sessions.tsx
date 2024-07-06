@@ -1,30 +1,33 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import CustomCard from '../../../components/CustomCard';
 import CustomButton from '../../../components/CustomButton2';
 import NewSessionForm from '@/components/NewSession';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useSession } from '@/contexts/SessionContext';
 import { useCourseContext } from '@/contexts/CourseContext';
+import { useSession } from '@/contexts/SessionContext';
 
 const SessionsScreen: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('Semester');
   const [showNewSessionForm, setShowNewSessionForm] = useState(false);
   const { courseId } = useLocalSearchParams();
-  const { sessions } = useSession();
   const { courses } = useCourseContext();
+  const { sessions } = useSession();
+  const router = useRouter();
 
   const course = courses.find(c => c._id === courseId);
-  const filteredSessions = sessions.filter(session => session.course === courseId);
+  const filteredSessions = sessions.filter(session => session.course._id === courseId);
 
-  // Function to handle opening the new session form
   const handleNewSession = () => {
     setShowNewSessionForm(true);
   };
 
-  // Function to handle closing the new session form
   const handleCloseNewSessionForm = () => {
     setShowNewSessionForm(false);
+  };
+
+  const handleMoreDetails = (sessionId: string) => {
+    router.navigate({ pathname: '/instructor/records', params: { sessionId: sessionId } });
   };
 
   return course && (
@@ -58,9 +61,10 @@ const SessionsScreen: React.FC = () => {
           />
 
           {filteredSessions.map((session, index) => (
-            <CustomCard key={index} title={session.location} containerStyle={styles.sessionCard}>
-              <Text style={styles.sessionTime}>{session.date.toLocaleTimeString()}</Text>
-              <Text style={styles.sessionStats}>{session.deadline.toLocaleTimeString()}</Text>
+            <CustomCard key={index} title={new Date(session.date).toLocaleString()} containerStyle={styles.sessionCard}>
+              <Text style={styles.sessionTime}>{new Date(session.date).toLocaleString()}</Text>
+              <Text style={styles.sessionStats}>{session.location}</Text>
+              <Text style={styles.sessionStats}>{new Date(session.deadline).toLocaleString()}</Text>
               <View style={styles.cardActions}>
                 <CustomButton
                   title="Download"
@@ -70,7 +74,7 @@ const SessionsScreen: React.FC = () => {
                 />
                 <CustomButton
                   title="More"
-                  onPress={() => console.log('Download')}
+                  onPress={() => handleMoreDetails(session._id)}
                   buttonStyle={styles.downloadButton}
                   textStyle={styles.editButton}
                 />

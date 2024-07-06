@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import FormField from './FormField'; // Ensure the path is correct
+import FormField from './FormField';
 import CustomButton from './CustomButton';
-import { Course } from '@/types';
+import { Course, SessionC } from '@/types';
 import FormDropdown from './FormDropdown';
 import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
@@ -11,29 +11,29 @@ import { useSession } from '@/contexts/SessionContext';
 interface Item {
     label: string;
     value: any;
-  }
+}
 
 interface NewSessionFormProps {
-    selectedCourse: Course;
+    selectedCourse?: Course;
     onClose: () => void;
-    isLoading: boolean;
+    isLoading?: boolean;
 }
 
 const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose, isLoading }) => {
     const { courses } = useCourseContext();
     const { createSession } = useSession();
     const { user } = useAuthContext();
-    const [courseId, setCourseId] = useState(selectedCourse._id);
+    const [courseId, setCourseId] = useState(selectedCourse? selectedCourse._id : courses.find(c => user?.courseCodes?.includes(c.code))?._id);
     const [startInMinutes, setStartInMinutes] = useState(0);
-    const [endInMinutes, setEndInMinutes] = useState(20);
+    const [endInMinutes, setEndInMinutes] = useState(5);
+    const [location, setLocation] = useState('Default Room');
 
     const timeOptions = [
-        {label: "Now", value: 0},    
-        {label: "10mins", value: 10},    
-        {label: "20mins", value: 20},   
-        {label: "30mins", value: 30},   
-        {label: "40mins", value: 40},   
-        {label: "50mins", value: 50},   
+        { label: "Now", value: 0 },
+        { label: "5 mins", value: 5 },
+        { label: "10 mins", value: 10 },
+        { label: "15 mins", value: 15 },
+        { label: "20 mins", value: 20 },
     ];
 
     const courseOptions: Item[] = courses.filter(c => user?.courseCodes?.includes(c.code)).map(course => ({
@@ -46,20 +46,20 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
     };
 
     const handleConfirm = async () => {
-        const startTime = calculateDate(startInMinutes);
-        const endTime = calculateDate(endInMinutes);
-        const newSession = {
-            sessionId: `session-${Date.now()}`,
-            courseId,
-            instructorId: user?.instructorId ?? '',
-            location: 'Default Location',
-            startTime,
-            endTime,
-            studentsPresent: 0,
-            studentsAbsent: 0
-        };
-        await createSession(newSession);
-        onClose(); 
+        if(courseId){
+            const date = calculateDate(startInMinutes);
+            const deadline = calculateDate(startInMinutes + endInMinutes);
+            const newSession: SessionC = {
+                date: date,
+                deadline: deadline,
+                location: location,
+                course: courseId
+            };
+            await createSession(newSession);
+            onClose();
+        } else {
+            alert("Select a course First")
+        }
     };
 
     const handleCancel = () => {
@@ -68,13 +68,22 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
 
     return (
         <View style={styles.card}>
-            <Text style={styles.title}>New {selectedCourse.title} Session</Text>
+            <Text style={styles.title}>New {courses.find(c => c._id === courseId)?.title} Session</Text>
             <View style={styles.formFieldContainer}>
                 <FormDropdown
                     items={courseOptions}
                     selectedValue={courseId}
                     onValueChange={setCourseId}
                     title='Course'
+                />
+            </View>
+            <View style={styles.formFieldContainer}>
+                <FormField
+                    title="Location"
+                    value={location}
+                    handleChangeText={setLocation}
+                    placeholder='Hall'
+                    icon='location-icon'
                 />
             </View>
             <View style={styles.formFieldContainer}>

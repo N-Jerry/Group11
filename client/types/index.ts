@@ -53,7 +53,16 @@ export interface Parameter<K extends string = string, T = any> {
 }
 
 export interface Report {
-    _id?: string;
+    _id: string;
+    generatedBy: Partial<User>;
+    reportType: 'pdf' | 'excell';
+    generatedDate?: Date;
+    parameters: Parameter<string, string>[];
+    data: any;
+}
+
+export interface ReportR {
+    _id: string;
     generatedBy: string;
     reportType: 'pdf' | 'excell';
     generatedDate?: Date;
@@ -61,3 +70,24 @@ export interface Report {
     data: any;
 }
 
+export interface NotificationPreferences {
+    email: boolean;
+    sms: boolean;
+    push: boolean;
+}
+
+export interface SecuritySettings {
+    twoFactorAuth: 'enabled' | 'disabled';
+    loginAlerts: 'enabled' | 'disabled';
+}
+
+export interface PrivacySettings {
+    dataSharing: 'enabled' | 'disabled';
+    activityStatus: 'visible' | 'hidden';
+}
+
+export interface PersonalSettings {
+    notificationPreferences: NotificationPreferences;
+    securitySettings: SecuritySettings;
+    privacySettings: PrivacySettings;
+}

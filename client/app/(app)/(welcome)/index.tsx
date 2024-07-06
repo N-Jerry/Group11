@@ -1,10 +1,17 @@
 import CustomButton from '@/components/CustomButton';
+import { useAuthContext } from '@/contexts/AuthContext';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, Image, StyleSheet } from 'react-native';
 import Swiper from 'react-native-swiper';
 
 const Onboarding = () => {
+ const { user } = useAuthContext()
+  useEffect(() => {
+    if(user && user.userType === 'instructor') router.push('instructor') 
+    if(user && user.userType === 'student') router.push('student') 
+  }, [user])
+
   return (
     <Swiper style={styles.wrapper} showsButtons={true}>
       <View style={styles.slide}>

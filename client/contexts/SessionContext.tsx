@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Session, Report, SessionC } from '../types';
+import { Session, Report, SessionC, User } from '../types';
+import { saveAs } from 'file-saver';
 
 interface SessionContextProps {
     sessions: Session[];
@@ -11,8 +12,8 @@ interface SessionContextProps {
     createSession: (sessionData: Partial<SessionC>) => Promise<void>;
     updateSession: (id: string, sessionData: Partial<SessionC>) => Promise<void>;
     deleteSession: (id: string) => Promise<void>;
-    markAttendance: (sessionId: string, studentId: string) => Promise<void>;
-    generateAttendanceReport: (reportData: any) => Promise<void>;
+    markAttendance: (sessionId: string, studentId: string, status: string) => Promise<void>;
+    generateAttendanceReport: (reportData: any, user: User | undefined | null) => Promise<Report>;
     exportReport: (reportId: string, exportType: 'pdf' | 'excel') => Promise<void>;
 }
 
@@ -70,21 +71,23 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
         }
     };
 
-    const markAttendance = async (sessionId: string, studentId: string) => {
+    const markAttendance = async (sessionId: string, studentId: string, status: string) => {
         try {
-            await axios.post(`${baseURL}/main/sessions/mark-attendance`, { sessionId, studentId });
+            await axios.post(`${baseURL}/main/sessions/mark-attendance`, { sessionId, studentId, status });
             getSessions(); // Refresh sessions
         } catch (error) {
             console.error('Error marking attendance:', error);
         }
     };
 
-    const generateAttendanceReport = async (reportData: any) => {
+    const generateAttendanceReport = async (reportData: any, user: User | undefined | null): Promise<Report> => {
         try {
-            const response = await axios.post<Report>(`${baseURL}/main/sessions/report`, reportData);
+            const response = await axios.get<Report>(`${baseURL}/main/sessions/report/${user?._id}`, reportData);
             setReports([...reports, response.data]);
+            return response.data;
         } catch (error) {
             console.error('Error generating attendance report:', error);
+            throw error;
         }
     };
 
@@ -99,7 +102,16 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const exportReport = async (reportId: string, exportType: 'pdf' | 'excel') => {
         try {
-            await axios.post(`${baseURL}/main/reports/${reportId}`, { exportType });
+            const response = await axios.post(`${baseURL}/main/reports/${reportId}`, { reportId, exportType }, {
+                responseType: 'blob' // Ensure the response type is blob for file download
+            });
+
+            // Determine the correct file extension
+            const fileExtension = exportType === 'pdf' ? 'pdf' : 'xlsx';
+            const filename = `report_${reportId}.${fileExtension}`;
+
+            // Use the file-saver library to trigger the download
+            saveAs(new Blob([response.data]), filename);
         } catch (error) {
             console.error('Error exporting report:', error);
         }

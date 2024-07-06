@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import FormField from '@/components/FormField';
@@ -7,17 +7,21 @@ import { useAuthContext } from '@/contexts/AuthContext';
 
 const SignInScreen = () => {
   const router = useRouter();
-  const { signin } = useAuthContext()
+  const { signin, user } = useAuthContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [redirectToSignUp, setRedirectToSignUp] = useState(false);
 
+  useEffect(() => {
+    if(user && user.userType === 'instructor') router.push('instructor') 
+    if(user && user.userType === 'student') router.push('student') 
+  }, [user])
+
   const handleSignIn = async () => {
     setIsLoading(true);
     try {
       await signin(email, password); 
-      router.push('instructor'); // Navigate to the home screen after successful sign-in
     } catch (error: any) {
       console.error('Error during sign-in:', error);
       alert(`Signin failed: ${error.response?.data?.error || 'Please try again'}.`);

@@ -10,7 +10,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 
 const SignUpScreen = () => {
-    const { signup } = useAuthContext()
+    const { signup, user } = useAuthContext()
     const { courses } = useCourseContext()
     const router = useRouter();
     const [step, setStep] = useState(1);
@@ -24,6 +24,11 @@ const SignUpScreen = () => {
     const [identifier, setIdentifier] = useState('');
     const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if(user && user.userType === 'instructor') router.push('instructor') 
+        if(user && user.userType === 'student') router.push('student') 
+      }, [user])
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -47,7 +52,7 @@ const SignUpScreen = () => {
             };
 
             await signup(newUser);
-            router.push(`${userType === 'student' ? '/dashboard' : '/instructor'}`);
+            router.push(`${userType === 'student' ? '/student' : '/instructor'}`);
         } catch (error: any) {
             console.error('Error during signup:', error);
             alert(`Signin failed: ${error.response?.data?.error || 'Please try again'}.`);

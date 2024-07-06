@@ -126,28 +126,31 @@ exports.deleteSession = async (req, res) => {
     }
 };
 
-
 // Mark attendance for a student
 exports.markAttendance = async (req, res) => {
     try {
-        const { sessionId, studentId } = req.body;
+        const { sessionId, studentId, status } = req.body;
 
-        const user = await User.findById(studentId)
+        const user = await User.findById(studentId);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         const session = await Session.findById(sessionId);
         if (!session) {
             return res.status(404).json({ error: 'Session not found' });
         }
 
-        // Find the record for the student and update status to 'present'
+        // Find the record for the student and update status
         const record = session.records.find(record => record.student.toString() === studentId);
         if (!record) {
             return res.status(404).json({ error: 'Record for student not found in this session' });
         }
 
-        record.status = 'present';
+        record.status = status;
 
         await session.save();
-        res.status(200).json({ message: `Student ${user.studentId} is present for ${session.date}`, session: session });
+        res.status(200).json({ message: `Attendance status updated to ${status} for student ${user.studentId}`, session });
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
@@ -229,9 +232,9 @@ exports.generateAttendanceReport = async (req, res) => {
             data: reportData
         });
 
-        await report.save();
+        const data = await report.save();
 
-        res.status(200).json(reportData);
+        res.status(200).json(data);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -283,9 +286,9 @@ exports.exportReport = async (req, res) => {
         }
 
         // Check if the user requesting the export matches the generatedBy user
-        if (report.generatedBy._id.toString() !== req.params._id.toString()) {
-            return res.status(403).json({ error: 'Unauthorized to export this report' });
-        }
+        //if (report.generatedBy._id.toString() !== req.params._id.toString()) {
+        //  return res.status(403).json({ error: 'Unauthorized to export this report' });
+        //}
 
         let filename = `report_${reportId}`;
 
