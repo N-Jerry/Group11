@@ -43,18 +43,6 @@ export default function AppLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="index"
-        options={{
-          headerTitle: "Home",
-          headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-          ),
-          headerRight: renderHeaderRight,
-        }}
-      />
-      <Stack.Screen
         name="student"
         options={{
           headerTitle: "Students",

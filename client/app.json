@@ -2,6 +2,7 @@
   "expo": {
     "name": "Biometric-Aplication",
     "slug": "biometric-app",
+    "entryPoint": "./app/_layout.tsx",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

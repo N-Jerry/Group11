@@ -3,7 +3,7 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { CourseProvider } from '@/contexts/CourseContext';
 import { SessionProvider } from '@/contexts/SessionContext';
-import { Slot } from 'expo-router'; // Adjust this import as needed
+import { Slot } from 'expo-router';
 import { FeedbackProvider } from '@/contexts/FeedbackContext';
 
 export default function RootLayout() {
