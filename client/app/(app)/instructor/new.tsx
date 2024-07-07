@@ -154,11 +154,12 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
 
 const styles = StyleSheet.create({
     card: {
+        alignSelf: 'center',
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#fff',
-        padding: 20,
+        padding: 15,
         width: 300,
         borderRadius: 10,
         borderWidth: 1,
@@ -172,16 +173,16 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 20,
+        marginBottom: 10,
         color: '#436cfc',
     },
     formFieldContainer: {
         width: '100%',
-        marginBottom: 16,
     },
     locationText: {
         fontSize: 16,
         color: '#333',
+        marginBottom: 5,
     },
     actions: {
         flexDirection: 'row',
