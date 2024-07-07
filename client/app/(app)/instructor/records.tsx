@@ -21,22 +21,23 @@ const RecordsScreen: React.FC = () => {
   const [filteredStudents, setFilteredStudents] = useState<Record[]>([]);
   const [attendanceUpdates, setAttendanceUpdates] = useState<{ [key: string]: string }>({});
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
 
   const filteredCourses = courses.filter(c => user?.courseCodes?.includes(c.code));
-  const filteredSessions = sessionId
-    ? sessions.filter(session => session._id === sessionId)
-    : selectedCourse
-      ? sessions.filter(session => session.course._id === selectedCourse._id)
+  const filteredSessions = selectedCourse
+    ? sessions.filter(session => session.course._id === selectedCourse._id)
+    : sessionId
+      ? sessions.filter(session => session._id === sessionId)
       : sessions.filter(session => filteredCourses.some(c => c._id === session.course._id));
 
   useEffect(() => {
     if (sessionId) {
       const foundSession = sessions.find(session => session._id === sessionId);
       setSession(foundSession || null);
-    } else if (filteredSessions.length > 0) {
+    } else if (selectedCourse && filteredSessions.length > 0) {
       setSession(filteredSessions[0]);
     }
-  }, [sessionId, sessions, filteredSessions]);
+  }, [sessionId, sessions, selectedCourse, filteredSessions]);
 
   useEffect(() => {
     if (session && searchInput) {
@@ -131,13 +132,37 @@ const RecordsScreen: React.FC = () => {
           </TouchableOpacity>
         ))}
       </View>
+      <View style={styles.tabContainer}>
+        {filteredSessions.map(sess => (
+          <TouchableOpacity
+            key={sess._id}
+            style={[styles.tab, selectedSession?._id === sess._id && styles.activeTab]}
+            onPress={() => setSelectedSession(sess)}
+          >
+            <Text style={[styles.tabText, selectedSession?._id === sess._id && styles.activeTabText]}>
+              {new Date(sess.date).toLocaleDateString()}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <Text style={styles.header}>Attendance Records</Text>
-      {session.records.map((record, index) => (
+      {selectedSession && selectedSession.records.map((record, index) => (
         <View key={index} style={styles.recordContainer}>
           <Text style={styles.recordText}>Student ID: {record.student.studentId}</Text>
           <Text style={styles.recordText}>
             Status: {attendanceUpdates[record.student.studentId!] ?? record.status}
           </Text>
+          <TouchableOpacity
+            style={[
+              styles.toggleButton,
+              record.status === 'present' ? styles.present : styles.absent,
+            ]}
+            onPress={() => handleAttendanceToggle(record.student._id!, record.status)}
+          >
+            <Text style={styles.buttonText}>
+              {attendanceUpdates[record.student.studentId!] ?? record.status}
+            </Text>
+          </TouchableOpacity>
         </View>
       ))}
       {loading ? (
@@ -305,4 +330,3 @@ const styles = StyleSheet.create({
 });
 
 export default RecordsScreen;
-
