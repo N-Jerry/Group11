@@ -8,6 +8,7 @@ import { useSession } from '@/contexts/SessionContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 import * as Location from 'expo-location';
 import PieChart from '@/components/PieChart';
+import CustomButton from '@/components/CustomButton2';
 
 const StudentDashboardScreen = () => {
   const { user } = useAuthContext();
@@ -123,10 +124,10 @@ const StudentDashboardScreen = () => {
   };
 
 
-const data = [
-  { label: 'Present', value: totalPresents, color: '#00b894' },
-  { label: 'Absent', value: totalAbsences, color: '#d63031' },
-];
+  const data = [
+    { label: 'Present', value: totalPresents, color: '#00b894' },
+    { label: 'Absent', value: totalAbsences, color: '#d63031' },
+  ];
 
 
   return (
@@ -161,13 +162,8 @@ const data = [
             <ActivityIndicator size="large" color="#0000ff" />
           ) : (
             <>
-              <Text style={styles.historySummary}>
-                Presents: {totalPresents} | Absences: {totalAbsences}
-              </Text>
-              <PieChart data={data} />
-              <TouchableOpacity style={styles.historyDetails} onPress={() => router.navigate('student/history')}>
-                <Text>View Details</Text>
-              </TouchableOpacity>
+              <PieChart presence={totalPresents} absence={totalAbsences} />
+              <CustomButton buttonStyle={styles.historyDetails} onPress={() => router.navigate('student/history')} title='View History Details' />
             </>
           )}
         </View>
@@ -230,11 +226,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   historyDetails: {
-    padding: 10,
-    backgroundColor: '#ddd',
-    borderRadius: 5,
-    marginTop: 5,
-  },
+    marginTop: 20,
+    backgroundColor: 'gray',
+  }
 });
 
 export default StudentDashboardScreen;
