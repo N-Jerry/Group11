@@ -6,11 +6,13 @@ import { Session, Record } from '@/types';
 import CustomButton from '@/components/CustomButton2';
 import { useAuthContext } from '@/contexts/AuthContext';
 import FormField from '@/components/FormField';
+import { useCourseContext } from '@/contexts/CourseContext';
 
 const RecordsScreen: React.FC = () => {
   const { user } = useAuthContext();
   const { sessionId } = useLocalSearchParams();
-  const { getSessionById, generateAttendanceReport, exportReport, markAttendance } = useSession();
+  const { courses } = useCourseContext();
+  const { sessions, generateAttendanceReport, exportReport, markAttendance } = useSession();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(false);
   const [reportGenerated, setReportGenerated] = useState(false);
@@ -19,16 +21,19 @@ const RecordsScreen: React.FC = () => {
   const [filteredStudents, setFilteredStudents] = useState<Record[]>([]);
   const [attendanceUpdates, setAttendanceUpdates] = useState<{ [key: string]: string }>({});
 
-  useEffect(() => {
-    const fetchSession = async () => {
-      if (typeof sessionId === 'string') {
-        const fetchedSession = await getSessionById(sessionId);
-        setSession(fetchedSession);
-      }
-    };
+  const filteredCourses = courses.filter(c => user?.courseCodes?.includes(c.code));
+  const filteredSessions = sessionId
+    ? sessions.filter(session => session._id === sessionId)
+    : sessions.filter(session => filteredCourses.some(c => c._id === session.course._id));
 
-    fetchSession();
-  }, [sessionId]);
+  useEffect(() => {
+    if (sessionId) {
+      const foundSession = sessions.find(session => session._id === sessionId);
+      setSession(foundSession || null);
+    } else if (filteredSessions.length > 0) {
+      setSession(filteredSessions[0]);
+    }
+  }, [sessionId, sessions, filteredSessions]);
 
   useEffect(() => {
     if (session && searchInput) {
@@ -75,16 +80,17 @@ const RecordsScreen: React.FC = () => {
           const updatedRecords = prevSession.records.map(record => {
             if (record.student.studentId === studentId) {
               return {
-                ...record, status: newStatus,
-              }
+                ...record,
+                status: newStatus,
+              };
             }
-            return record
-          })
+            return record;
+          });
           return {
             ...prevSession,
-            records: updatedRecords
-          }
-        })
+            records: updatedRecords,
+          };
+        });
         setAttendanceUpdates(prev => ({
           ...prev,
           [studentId]: newStatus,
@@ -113,7 +119,9 @@ const RecordsScreen: React.FC = () => {
       {session.records.map((record, index) => (
         <View key={index} style={styles.recordContainer}>
           <Text style={styles.recordText}>Student ID: {record.student.studentId}</Text>
-          <Text style={styles.recordText}>Status: {attendanceUpdates[record.student.studentId!] ?? record.status}</Text>
+          <Text style={styles.recordText}>
+            Status: {attendanceUpdates[record.student.studentId!] ?? record.status}
+          </Text>
         </View>
       ))}
       {loading ? (
@@ -149,7 +157,7 @@ const RecordsScreen: React.FC = () => {
         <Text style={styles.header}>Search by Matricule</Text>
         <FormField
           otherStyles={styles.searchInput}
-          title='Student'
+          title="Student"
           placeholder="Enter matricule"
           value={searchInput}
           handleChangeText={setSearchInput}
