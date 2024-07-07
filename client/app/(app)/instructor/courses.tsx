@@ -73,7 +73,7 @@ const CoursesScreen: React.FC = () => {
                 accessibilityLabel={`Filter by ${level}`}
               >
                 <Text style={[styles.filterText, selectedLevel === level && styles.activeFilterText]}>
-                  {level}
+                  {`Level ${level}`}
                 </Text>
               </TouchableOpacity>
             ))}

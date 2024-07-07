@@ -28,12 +28,23 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
     const [endInMinutes, setEndInMinutes] = useState(5);
     const [coords, setCoords] = useState<{ latitude: number, longitude: number } | null>(null);
 
-    const timeOptions = [
+    const timeInOptions = [
         { label: "Now", value: 0 },
         { label: "5 mins", value: 5 },
         { label: "10 mins", value: 10 },
         { label: "15 mins", value: 15 },
         { label: "20 mins", value: 20 },
+        { label: "30 mins", value: 30 },
+    ];
+
+    const timeOutOptions = [
+        { label: "5 mins", value: 5 },
+        { label: "10 mins", value: 10 },
+        { label: "15 mins", value: 15 },
+        { label: "20 mins", value: 20 },
+        { label: "30 mins", value: 30 },
+        { label: "45 mins", value: 45 },
+        { label: "60 mins", value: 60 },
     ];
 
     const courseOptions: Item[] = courses.filter(c => user?.courseCodes?.includes(c.code)).map(course => ({
@@ -109,7 +120,7 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
             </View>
             <View style={styles.formFieldContainer}>
                 <FormDropdown
-                    items={timeOptions}
+                    items={timeInOptions}
                     selectedValue={startInMinutes}
                     onValueChange={setStartInMinutes}
                     title='Starts In'
@@ -117,7 +128,7 @@ const NewSessionForm: React.FC<NewSessionFormProps> = ({ selectedCourse, onClose
             </View>
             <View style={styles.formFieldContainer}>
                 <FormDropdown
-                    items={timeOptions}
+                    items={timeOutOptions}
                     selectedValue={endInMinutes}
                     onValueChange={setEndInMinutes}
                     title='Ends In'
