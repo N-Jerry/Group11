@@ -8,7 +8,6 @@ import { useSession } from '@/contexts/SessionContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 import * as Location from 'expo-location';
 import PieChart from '@/components/PieChart';
-import VPiechart from '@/components/VPiechart';
 
 const StudentDashboardScreen = () => {
   const { user } = useAuthContext();
@@ -129,26 +128,6 @@ const data = [
   { label: 'Absent', value: totalAbsences, color: '#d63031' },
 ];
 
-const calculatePieChartData = () => {
-  const totalSessions = totalPresents + totalAbsences;
-  const presentPercentage = totalSessions > 0 ? (totalPresents / totalSessions) * 100 : 0;
-  const absentPercentage = totalSessions > 0 ? (totalAbsences / totalSessions) * 100 : 0;
-
-  return [
-    { key: 'Present', amount: presentPercentage, svg: { fill: '#00cc00' } },
-    { key: 'Absent', amount: absentPercentage, svg: { fill: '#ff3300' } }
-  ];
-};
-
-const chartData = {
-  labels: ['Presents', 'Absences'],
-  datasets: [
-    {
-      data: [totalPresents, totalAbsences],
-    },
-  ],
-};
-
 
   return (
     <View style={styles.screen}>
@@ -186,10 +165,6 @@ const chartData = {
                 Presents: {totalPresents} | Absences: {totalAbsences}
               </Text>
               <PieChart data={data} />
-              <View style={{ margin: 20 }}>
-                <VPiechart data={calculatePieChartData()} outerRadius={'70%'} />
-                <VPiechart data={calculatePieChartData()} outerRadius={'70%'} />
-              </View>
               <TouchableOpacity style={styles.historyDetails} onPress={() => router.navigate('student/history')}>
                 <Text>View Details</Text>
               </TouchableOpacity>
