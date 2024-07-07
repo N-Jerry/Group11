@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSession } from '@/contexts/SessionContext';
-import { Session, Record } from '@/types';
+import { Session, Record, Course } from '@/types'; // Assuming Course type is imported
 import CustomButton from '@/components/CustomButton2';
 import { useAuthContext } from '@/contexts/AuthContext';
 import FormField from '@/components/FormField';
@@ -20,11 +20,14 @@ const RecordsScreen: React.FC = () => {
   const [searchInput, setSearchInput] = useState('');
   const [filteredStudents, setFilteredStudents] = useState<Record[]>([]);
   const [attendanceUpdates, setAttendanceUpdates] = useState<{ [key: string]: string }>({});
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
 
   const filteredCourses = courses.filter(c => user?.courseCodes?.includes(c.code));
   const filteredSessions = sessionId
     ? sessions.filter(session => session._id === sessionId)
-    : sessions.filter(session => filteredCourses.some(c => c._id === session.course._id));
+    : selectedCourse
+      ? sessions.filter(session => session.course._id === selectedCourse._id)
+      : sessions.filter(session => filteredCourses.some(c => c._id === session.course._id));
 
   useEffect(() => {
     if (sessionId) {
@@ -115,6 +118,19 @@ const RecordsScreen: React.FC = () => {
       <Text style={styles.sessionDetail}>Date: {new Date(session.date).toLocaleString()}</Text>
       <Text style={styles.sessionDetail}>Deadline: {new Date(session.deadline).toLocaleString()}</Text>
       <Text style={styles.sessionDetail}>Location: {session.location}</Text>
+      <View style={styles.tabContainer}>
+        {filteredCourses.map(course => (
+          <TouchableOpacity
+            key={course._id}
+            style={[styles.tab, selectedCourse?.code === course.code && styles.activeTab]}
+            onPress={() => setSelectedCourse(course)}
+          >
+            <Text style={[styles.tabText, selectedCourse?.code === course.code && styles.activeTabText]}>
+              {course.code}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
       <Text style={styles.header}>Attendance Records</Text>
       {session.records.map((record, index) => (
         <View key={index} style={styles.recordContainer}>
@@ -265,6 +281,28 @@ const styles = StyleSheet.create({
   absent: {
     backgroundColor: '#dc3545',
   },
+  tabContainer: {
+    flexDirection: 'row',
+    marginBottom: 20,
+  },
+  tab: {
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 5,
+    marginRight: 10,
+    backgroundColor: '#ccc',
+  },
+  activeTab: {
+    backgroundColor: '#436cfc',
+  },
+  tabText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  activeTabText: {
+    color: '#fff',
+  },
 });
 
 export default RecordsScreen;
+
