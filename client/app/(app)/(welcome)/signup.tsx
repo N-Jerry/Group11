@@ -10,8 +10,8 @@ import { useAuthContext } from '@/contexts/AuthContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 
 const SignUpScreen = () => {
-    const { signup, user } = useAuthContext()
-    const { courses } = useCourseContext()
+    const { signup, user } = useAuthContext();
+    const { courses } = useCourseContext();
     const router = useRouter();
     const [step, setStep] = useState(1);
     const [name, setName] = useState('');
@@ -26,9 +26,9 @@ const SignUpScreen = () => {
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        if(user && user.userType === 'instructor') router.push('instructor') 
-        if(user && user.userType === 'student') router.push('student') 
-      }, [user])
+        if (user && user.userType === 'instructor') router.push('instructor');
+        if (user && user.userType === 'student') router.push('student');
+    }, [user]);
 
     const handleSignUp = async () => {
         if (password !== confirmPassword) {
@@ -55,7 +55,7 @@ const SignUpScreen = () => {
             router.push(`${userType === 'student' ? '/student' : '/instructor'}`);
         } catch (error: any) {
             console.error('Error during signup:', error);
-            alert(`Signin failed: ${error.response?.data?.error || 'Please try again'}.`);
+            alert(`Signup failed: ${error.response?.data?.error || 'Please try again'}.`);
         } finally {
             setIsLoading(false);
         }
@@ -103,21 +103,18 @@ const SignUpScreen = () => {
                             handleChangeText={setTel}
                             icon="call-outline"
                         />
-                        <FormDropdown
-                            title="User Type"
-                            selectedValue={userType}
-                            onValueChange={setUserType}
-                            items={[
-                                { label: 'Student', value: 'student' },
-                                { label: 'Instructor', value: 'instructor' },
-                                { label: 'School Admin', value: 'admin' },
-                            ]}
-                        />
-                        <CustomButton
-                            title="Next"
-                            handlePress={() => setStep(2)}
-                            isLoading={isLoading}
-                        />
+                        <View style={styles.buttonContainer}>
+                            <CustomButton
+                                title="Cancel"
+                                handlePress={() => router.push('/')}
+                                variant='secondary'
+                            />
+                            <CustomButton
+                                title="Continue"
+                                handlePress={() => setStep(2)}
+                                isLoading={isLoading}
+                            />
+                        </View>
                     </View>
                 );
             case 2:
@@ -129,6 +126,16 @@ const SignUpScreen = () => {
                             placeholder="Department"
                             handleChangeText={setDepartment}
                             icon="business-outline"
+                        />
+                        <FormDropdown
+                            title="User Type"
+                            selectedValue={userType}
+                            onValueChange={setUserType}
+                            items={[
+                                { label: 'Student', value: 'student' },
+                                { label: 'Instructor', value: 'instructor' },
+                                { label: 'School Admin', value: 'admin' },
+                            ]}
                         />
                         <FormField
                             title={userType === 'student' ? 'Student ID' : 'Instructor ID'}
@@ -146,11 +153,18 @@ const SignUpScreen = () => {
                                 value: course.code
                             }))}
                         />
-                        <CustomButton
-                            title={'Register'}
-                            handlePress={() => handleSignUp()}
-                            isLoading={isLoading}
-                        />
+                        <View style={styles.buttonContainer}>
+                            <CustomButton
+                                title="Back"
+                                handlePress={() => setStep(1)}
+                                variant='secondary'
+                            />
+                            <CustomButton
+                                title="Submit"
+                                handlePress={() => handleSignUp()}
+                                isLoading={isLoading}
+                            />
+                        </View>
                     </View>
                 );
             default:
@@ -161,7 +175,7 @@ const SignUpScreen = () => {
     return (
         <ScrollView contentContainerStyle={styles.scrollView}>
             <View style={styles.container}>
-                <Image source={require('@/assets/images/react-logo.png')} style={styles.logo} />
+                <Image source={require('@/assets/images/atiutubo.png')} style={styles.logo} />
                 <View style={styles.progressContainer}>
                     <View style={[styles.progressBar, { width: `${(step / 3) * 100}%` }]} />
                 </View>
@@ -205,28 +219,10 @@ const styles = StyleSheet.create({
         height: '100%',
         backgroundColor: '#007BFF',
     },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginBottom: 20,
-        color: '#007BFF',
-    },
-    description: {
-        textAlign: 'center',
-        marginBottom: 20,
-        fontSize: 16,
-        color: '#666',
-    },
-    fingerprint: {
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: '#e0e0e0',
-        borderRadius: 10,
-    },
-    fingerprintText: {
-        fontSize: 16,
-        color: '#007BFF',
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 20,
     },
     footerText: {
         textAlign: 'center',

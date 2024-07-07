@@ -4,7 +4,7 @@ import { View, Image, StyleSheet } from 'react-native';
 const Splash: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/favicon.png')} style={styles.logo} />
+      <Image source={require('../assets/images/atiutubo.png')} style={styles.logo} />
     </View>
   );
 };
@@ -14,6 +14,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignContent: 'center',
+    backgroundColor: '#fff'
   },
   logo: {
     width: 100,

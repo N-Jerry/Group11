@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 8,
     paddingHorizontal: 10,
+    paddingVertical: 8,
     marginBottom: 16,
     backgroundColor: '#F9F9F9',
     height: 48,
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
     flex: 1,
     color: '#000',
     fontSize: 16,
+    padding: 8,
   },
   icon: {
     marginRight: 10,

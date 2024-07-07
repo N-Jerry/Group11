@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ActivityIndicator, ScrollView } from 'react-native';
 import DashboardContainer from '@/components/DashboardContainer';
 import { router } from 'expo-router';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -7,13 +7,19 @@ import { Session } from '@/types';
 import { useSession } from '@/contexts/SessionContext';
 import { useCourseContext } from '@/contexts/CourseContext';
 import * as Location from 'expo-location';
+import PieChart from '@/components/PieChart';
+import VPiechart from '@/components/VPiechart';
 
 const StudentDashboardScreen = () => {
   const { user } = useAuthContext();
-  const { sessions, reports, generateAttendanceReport } = useSession();
+  const { sessions, generateAttendanceReport } = useSession();
   const { courses } = useCourseContext();
   const [ongoingSession, setOngoingSession] = useState<Session | null | undefined>(null);
   const [userCoords, setUserCoords] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [attendanceHistory, setAttendanceHistory] = useState<{ date: string; status: string }[]>([]);
+  const [totalPresents, setTotalPresents] = useState<number>(0);
+  const [totalAbsences, setTotalAbsences] = useState<number>(0);
 
   useEffect(() => {
     if (!user || user.userType !== 'student') {
@@ -21,7 +27,7 @@ const StudentDashboardScreen = () => {
     } else {
       fetchLocation();
       findOngoingSession();
-      FetchStudentHistory();
+      fetchStudentHistory();
     }
   }, [user, sessions, courses]);
 
@@ -52,11 +58,9 @@ const StudentDashboardScreen = () => {
         const sessionDate = new Date(session.date);
         const sessionDeadline = new Date(session.deadline);
 
-        // Check if the session's course code is in user's enrolled courses
         const sessionCourseCode = session.course.code;
         const isUserEnrolledInCourse = userCourses.some(course => course.code === sessionCourseCode);
 
-        // Check if current date is within session date and deadline
         const isSessionOngoing = now >= sessionDate && now <= sessionDeadline;
 
         return isUserEnrolledInCourse && isSessionOngoing;
@@ -69,12 +73,32 @@ const StudentDashboardScreen = () => {
     }
   };
 
-  const [loading, setLoading] = useState(false);
-  const FetchStudentHistory = async () => {
+  const fetchStudentHistory = async () => {
     setLoading(true);
     const reportData = { userId: user?._id };
     const report = await generateAttendanceReport(reportData, user);
     console.log("Report:", report);
+
+    if (report?.data) {
+      const history = report.data.map((sessionData: any) => ({
+        date: new Date(sessionData.date).toLocaleString(),
+        status: sessionData.attendance.find((att: any) => att.student === user?.studentId)?.status || 'unknown',
+      }));
+      setAttendanceHistory(history);
+
+      // Calculate total presents and absences
+      const totalPresentsCount = report.data.filter((sessionData: any) => {
+        return sessionData.attendance.some((att: any) => att.student === user?.studentId && att.status === 'present');
+      }).length;
+      setTotalPresents(totalPresentsCount);
+
+      const totalAbsencesCount = report.data.filter((sessionData: any) => {
+        return sessionData.attendance.every((att: any) => att.student === user?.studentId && att.status === 'absent');
+      }).length;
+      setTotalAbsences(totalAbsencesCount);
+
+    }
+
     setLoading(false);
   };
 
@@ -89,7 +113,6 @@ const StudentDashboardScreen = () => {
     return latDifference <= threshold && lonDifference <= threshold;
   };
 
-  let distance = 0;
   let [lat, lon] = [0, 0];
   const isUserNearSession = () => {
     if (userCoords && ongoingSession && ongoingSession.location) {
@@ -99,6 +122,33 @@ const StudentDashboardScreen = () => {
     }
     return false;
   };
+
+
+const data = [
+  { label: 'Present', value: totalPresents, color: '#00b894' },
+  { label: 'Absent', value: totalAbsences, color: '#d63031' },
+];
+
+const calculatePieChartData = () => {
+  const totalSessions = totalPresents + totalAbsences;
+  const presentPercentage = totalSessions > 0 ? (totalPresents / totalSessions) * 100 : 0;
+  const absentPercentage = totalSessions > 0 ? (totalAbsences / totalSessions) * 100 : 0;
+
+  return [
+    { key: 'Present', amount: presentPercentage, svg: { fill: '#00cc00' } },
+    { key: 'Absent', amount: absentPercentage, svg: { fill: '#ff3300' } }
+  ];
+};
+
+const chartData = {
+  labels: ['Presents', 'Absences'],
+  datasets: [
+    {
+      data: [totalPresents, totalAbsences],
+    },
+  ],
+};
+
 
   return (
     <View style={styles.screen}>
@@ -128,6 +178,23 @@ const StudentDashboardScreen = () => {
 
         <View style={styles.history}>
           <Text style={styles.historyTitle}>YOUR HISTORY</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color="#0000ff" />
+          ) : (
+            <>
+              <Text style={styles.historySummary}>
+                Presents: {totalPresents} | Absences: {totalAbsences}
+              </Text>
+              <PieChart data={data} />
+              <View style={{ margin: 20 }}>
+                <VPiechart data={calculatePieChartData()} outerRadius={'70%'} />
+                <VPiechart data={calculatePieChartData()} outerRadius={'70%'} />
+              </View>
+              <TouchableOpacity style={styles.historyDetails} onPress={() => router.navigate('student/history')}>
+                <Text>View Details</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
       </DashboardContainer>
     </View>
@@ -182,6 +249,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  historySummary: {
+    fontSize: 14,
+    marginBottom: 10,
+  },
+  historyDetails: {
+    padding: 10,
+    backgroundColor: '#ddd',
+    borderRadius: 5,
+    marginTop: 5,
   },
 });
 

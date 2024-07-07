@@ -36,7 +36,7 @@ const SignInScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Image source={require('@/assets/images/react-logo.png')} style={styles.logo} />
+      <Image source={require('@/assets/images/atiutubo.png')} style={styles.logo} />
       <Text style={styles.welcomeText}>Welcome Back</Text>
       <Text style={styles.loginPrompt}>Login to continue</Text>
       <FormField
@@ -59,10 +59,6 @@ const SignInScreen = () => {
         handlePress={handleSignIn}
         isLoading={isLoading}
       />
-      <Text style={styles.orText}>Or</Text>
-      <TouchableOpacity style={styles.googleButton}>
-        <Image source={require('@/assets/images/react-logo.png')} style={styles.googleIcon} />
-      </TouchableOpacity>
       <Text style={styles.footerText}>
         Don't have an account?{' '}
         <Text onPress={() => setRedirectToSignUp(true)} style={styles.footerLink}>

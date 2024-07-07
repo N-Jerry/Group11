@@ -14,7 +14,7 @@ const CustomSplashScreen = ({ onReady }: { onReady: () => void }) => {
 
   return (
     <ImageBackground
-      source={require('../assets/images/splash.png')}
+      source={require('../assets/images/atiutubo.png')}
       style={styles.background}
     >
       <View style={styles.container}>

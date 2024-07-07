@@ -207,7 +207,7 @@ exports.generateAttendanceReport = async (req, res) => {
 
             // Calculate attendance for each record
             session.records.forEach(record => {
-                if (!userId || record.student.toString() === userId) {
+                if (!userId || record.student._id.toString() === userId) {
                     const attendanceData = {
                         student: record.student.studentId,
                         status: record.status

@@ -2,11 +2,9 @@ import { useFonts } from 'expo-font';
 import { router, Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import 'react-native-reanimated';
-
-import CustomSplashScreen from '@/components/SplashScreen';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import Splash from '@/components/splash';
 
 export default function AppLayout() {
   const [isSplashReady, setSplashReady] = useState(false);
@@ -19,8 +17,10 @@ export default function AppLayout() {
       try {
         await SplashScreen.preventAutoHideAsync();
         if (fontsLoaded) {
-          setSplashReady(true);
-          await SplashScreen.hideAsync();
+          setTimeout(async () => {
+            setSplashReady(true);
+            await SplashScreen.hideAsync();
+          }, 3000); // Show splash screen for 3 seconds more
         }
       } catch (error) {
         console.error('Error preparing app:', error);
@@ -31,7 +31,7 @@ export default function AppLayout() {
   }, [fontsLoaded]);
 
   if (!fontsLoaded || !isSplashReady) {
-    return <CustomSplashScreen onReady={() => setSplashReady(true)} />;
+    return <Splash />;
   }
 
   const renderHeaderRight = () => (
@@ -68,6 +68,12 @@ export default function AppLayout() {
       />
       <Stack.Screen
         name="settings"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="(welcome)"
         options={{
           headerShown: false,
         }}

@@ -67,6 +67,9 @@ const styles = StyleSheet.create({
     color: '#000',
     fontFamily: 'psemibold',
     fontSize: 16,
+    borderColor: 'none',
+    borderWidth: 0,
+    backgroundColor: 'transparent'
   },
 });
 

@@ -12,6 +12,7 @@ export default function InstructorLayout() {
         <Stack>
             <Stack.Screen name="index" options={{ headerShown: false}} />
             <Stack.Screen name="checkin" options={{ headerShown: false}} />
+            <Stack.Screen name="history" options={{ headerShown: false}} />
         </Stack>
     </>
   );
