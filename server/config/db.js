@@ -5,10 +5,7 @@ const mongoose = require("mongoose");
 const mongoURI = process.env.MONGODB_URI;
 
 // Connect to MongoDB using Mongoose
-const dbConnection = mongoose.connect(mongoURI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+const dbConnection = mongoose.connect(mongoURI)
 .then(() => {
   console.log(`Connected to MongoDB database at ${mongoose.modelNames()}`);
   return mongoose.connection;
