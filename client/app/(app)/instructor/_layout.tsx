@@ -9,11 +9,6 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function InstructorLayout() {
   const colorScheme = useColorScheme(); // Get the current color scheme
-  const [isNewSessionModalVisible, setNewSessionModalVisible] = useState(false);
-
-  const toggleNewSessionModal = () => {
-    setNewSessionModalVisible(!isNewSessionModalVisible);
-  };
 
   return (
     <>
@@ -41,6 +36,16 @@ export default function InstructorLayout() {
           }}
         />
         <Tabs.Screen
+          name="new"
+          options={{
+            title: 'New Session',
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="add" size={32} color={color} />
+            ),
+            tabBarLabel: ({ focused }) => focused ? <Text style={styles.tabLabel}>New Session</Text> : null,
+          }}
+        />
+        <Tabs.Screen
           name="sessions"
           options={{
             title: 'Sessions',
@@ -59,16 +64,6 @@ export default function InstructorLayout() {
           }}
         />
       </Tabs>
-
-      {isNewSessionModalVisible && (
-        <NewSessionForm onClose={toggleNewSessionModal} />
-      )}
-
-      {/* Add a floating button for new session */}
-      <TouchableOpacity style={styles.floatingButton} onPress={toggleNewSessionModal}>
-        <Ionicons name="add" size={36} color="#fff" />
-        <Text style={styles.floatingButtonText}>New Session</Text>
-      </TouchableOpacity>
     </>
   );
 }
