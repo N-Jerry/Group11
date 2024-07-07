@@ -69,12 +69,6 @@ export default function InstructorLayout() {
         <Ionicons name="add" size={36} color="#fff" />
         <Text style={styles.floatingButtonText}>New Session</Text>
       </TouchableOpacity>
-
-      {/* Add a floating button for settings */}
-      <TouchableOpacity style={[styles.floatingButton, styles.settingsButton]} onPress={()=>router.push("settings")}>
-        <Ionicons name="settings" size={36} color="#fff" />
-        <Text style={styles.floatingButtonText}>Settings</Text>
-      </TouchableOpacity>
     </>
   );
 }

@@ -6,6 +6,7 @@ import NewSessionForm from '@/components/NewSession';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCourseContext } from '@/contexts/CourseContext';
 import { useSession } from '@/contexts/SessionContext';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 const SessionsScreen: React.FC = () => {
   const [selectedFilter, setSelectedFilter] = useState('Semester');
@@ -13,10 +14,14 @@ const SessionsScreen: React.FC = () => {
   const { courseId } = useLocalSearchParams();
   const { courses } = useCourseContext();
   const { sessions } = useSession();
+  const { user } = useAuthContext();
   const router = useRouter();
 
   const course = courses.find(c => c._id === courseId);
-  const filteredSessions = sessions.filter(session => session.course._id === courseId);
+  const filteredCourses = courses.filter(c => user?.courseCodes?.includes(c.code));
+  const filteredSessions = courseId 
+    ? sessions.filter(session => session.course._id === courseId) 
+    : sessions.filter(session => filteredCourses.some(c => c._id === session.course._id));
 
   const handleNewSession = () => {
     setShowNewSessionForm(true);
@@ -30,9 +35,9 @@ const SessionsScreen: React.FC = () => {
     router.navigate({ pathname: '/instructor/records', params: { sessionId: sessionId } });
   };
 
-  return course && (
+  return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{course.title}</Text>
+      <Text style={styles.header}>{course ? course.title : 'All Courses'}</Text>
       {showNewSessionForm ? (
         <View>
           <NewSessionForm selectedCourse={course} onClose={handleCloseNewSessionForm} isLoading={false} />
@@ -61,7 +66,7 @@ const SessionsScreen: React.FC = () => {
           />
 
           {filteredSessions.map((session, index) => (
-            <CustomCard key={index} title={new Date(session.date).toLocaleString()} containerStyle={styles.sessionCard}>
+            <CustomCard key={index} title={session.course.code} containerStyle={styles.sessionCard}>
               <Text style={styles.sessionTime}>{new Date(session.date).toLocaleString()}</Text>
               <Text style={styles.sessionStats}>{session.location}</Text>
               <Text style={styles.sessionStats}>{new Date(session.deadline).toLocaleString()}</Text>
