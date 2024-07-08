@@ -144,7 +144,7 @@ const RecordsScreen: React.FC = () => {
       {loading ? (
         <ActivityIndicator size="large" color="#436cfc" />
       ) : (
-        <>
+        <View style={styles.buttonContainer}>
           {!reportGenerated ? (
             <CustomButton
               title="Generate Report"
@@ -153,7 +153,7 @@ const RecordsScreen: React.FC = () => {
               textStyle={styles.buttonText}
             />
           ) : (
-            <>
+            <View style={styles.buttonContainer}>
               <CustomButton
                 title="Export as PDF"
                 onPress={() => handleExportReport('pdf')}
@@ -166,12 +166,13 @@ const RecordsScreen: React.FC = () => {
                 buttonStyle={styles.exportButton}
                 textStyle={styles.buttonText}
               />
-            </>
+            </View>
           )}
-        </>
+        </View>
       )}
       <View style={styles.searchContainer}>
-        <Text style={styles.header}>Search by Matricule</Text>
+        <Text style={styles.header}>Handle Exceptions</Text>
+        <Text style={styles.body}>Search a student by matricule and click on the button at the right to justify his/her absence or dismiss the student from the session by marking absent</Text>
         <FormField
           otherStyles={styles.searchInput}
           title="Student"
@@ -218,10 +219,17 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   header: {
-    fontSize: 24,
+    textAlign: 'center',
+    fontSize: 32,
     fontWeight: 'bold',
-    marginBottom: 20,
+    margin: 5,
     color: '#436cfc',
+  },
+  body: {
+    textAlign: 'center',
+    fontSize: 16,
+    marginBottom: 20,
+    color: 'black',
   },
   sessionDetail: {
     fontSize: 18,
@@ -240,10 +248,16 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   generateButton: {
+    width: 150,
     marginTop: 20,
     backgroundColor: '#436cfc',
   },
+  buttonContainer: {
+    display: 'flex',
+    alignItems: 'center'
+  },
   exportButton: {
+    width: 150,
     marginTop: 10,
     backgroundColor: '#28a745',
   },

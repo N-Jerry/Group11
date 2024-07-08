@@ -29,7 +29,7 @@ const StudentDashboardScreen = () => {
       findOngoingSession();
       fetchStudentHistory();
     }
-  }, [user, sessions, courses]);
+  }, []);
 
   const fetchLocation = async () => {
     try {
@@ -50,6 +50,8 @@ const StudentDashboardScreen = () => {
   };
 
   const findOngoingSession = () => {
+    console.log("Fetching ongoing session");
+
     if (user?.courseCodes && user.courseCodes.length > 0) {
       const now = new Date();
       const userCourses = courses.filter(c => user.courseCodes?.includes(c.code));

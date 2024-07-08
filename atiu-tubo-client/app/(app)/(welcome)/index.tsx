@@ -11,6 +11,7 @@ const Onboarding = () => {
   useEffect(() => {
     if (user && user.userType === "instructor") router.push("/instructor");
     if (user && user.userType === "student") router.push("/student");
+    if (user && user.userType === "admin") router.push("/admin");
   }, [user]);
 
   return (
