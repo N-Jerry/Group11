@@ -5,4 +5,3 @@ beforeAll(async () => {
     });
     console.log(`Connected to MongoDB database at ${mongoose.connection.host}:${mongoose.connection.port}`);
   });
-  

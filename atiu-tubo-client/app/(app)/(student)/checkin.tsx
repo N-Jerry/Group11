@@ -53,7 +53,6 @@ const CheckInScreen = () => {
     try {
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: "Authenticate to mark attendance",
-        disableDeviceFallback: true
       });
       if (result.success) {
         handleMarkAttendance();
