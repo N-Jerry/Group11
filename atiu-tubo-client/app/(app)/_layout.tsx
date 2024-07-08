@@ -13,6 +13,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // Import this
 import { Ionicons } from "@expo/vector-icons";
 import { Text, View } from "react-native";
+import Splash from "@/components/splash";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -30,7 +31,7 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) {
-    return null;
+    return <Splash />;
   }
 
   const renderHeaderLeft = () => (

@@ -3,6 +3,9 @@ import axios from 'axios';
 import { Session, Report, SessionC, User } from '../types';
 import { Platform } from 'react-native';
 import * as FileSystem from 'expo-file-system'; // Alternative for file downloads in React Native
+import ip from "../ipAddress.json"
+import { Buffer } from 'buffer'; // Ensure you have buffer installed
+
 // Import saveAs conditionally
 let saveAs: any;
 if (Platform.OS === 'web') {
@@ -25,7 +28,7 @@ interface SessionContextProps {
 
 const SessionContext = createContext<SessionContextProps | undefined>(undefined);
 
-const baseURL = 'http://192.168.1.179:5000/api';
+const baseURL = `http://${ip.ipAddress}:5000/api`;
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [sessions, setSessions] = useState<Session[]>([]);
@@ -122,9 +125,12 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
             } else {
                 // Use FileSystem to handle file downloads on mobile platforms
                 const fileUri = `${FileSystem.documentDirectory}${filename}`;
-                await FileSystem.writeAsStringAsync(fileUri, response.data, { encoding: FileSystem.EncodingType.Base64 });
-                console.log(`File saved to ${fileUri}`);
-                // You can add more code here to handle opening or sharing the file
+                await FileSystem.writeAsStringAsync(
+                    fileUri, 
+                    Buffer.from(response.data, 'binary').toString('base64'), 
+                    { encoding: FileSystem.EncodingType.Base64 }
+                );
+                                console.log(`File saved to ${fileUri}`);
             }
         } catch (error) {
             console.error('Error exporting report:', error);

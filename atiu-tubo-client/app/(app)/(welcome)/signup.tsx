@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { User } from "@/types";
+import Stepper from "@/components/Stepper";
 import FormField from "@/components/FormField";
 import FormDropdown from "@/components/FormDropdown";
 import CustomButton from "@/components/CustomButton";
@@ -199,11 +200,7 @@ const SignUpScreen = () => {
               source={require("@/assets/images/atiutubo.png")}
               style={styles.logo}
             />
-            <View style={styles.progressContainer}>
-              <View
-                style={[styles.progressBar, { width: `${(step / 3) * 100}%` }]}
-              />
-            </View>
+            <Stepper currentStep={step} totalSteps={3} />
             {renderStepContent()}
             <Text style={styles.footerText}>
               Already have an account?{" "}
@@ -237,17 +234,6 @@ const styles = StyleSheet.create({
     height: 100,
     alignSelf: "center",
     marginBottom: 20,
-  },
-  progressContainer: {
-    height: 10,
-    backgroundColor: "#e0e0e0",
-    borderRadius: 5,
-    overflow: "hidden",
-    marginVertical: 20,
-  },
-  progressBar: {
-    height: "100%",
-    backgroundColor: "#007BFF",
   },
   buttonContainer: {
     flexDirection: "row",

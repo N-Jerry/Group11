@@ -7,6 +7,7 @@ import { useRouter } from 'expo-router';
 import { AuthProvider, useAuthContext } from '@/contexts/AuthContext';
 import { SessionProvider, useSession } from '@/contexts/SessionContext';
 import { CourseProvider, useCourseContext } from '@/contexts/CourseContext';
+import { Session } from '@/types';
 
 const InstructorDashboardScreen: React.FC = () => {
   const router = useRouter();
@@ -22,8 +23,11 @@ const InstructorDashboardScreen: React.FC = () => {
   const filteredSessions = sessions.filter(session => filteredCourses.some(course => course._id === session.course._id));
   const sessionCount = filteredSessions.length;
 
-  const filteredStudents = users?.filter(user => user.userType === 'student' && filteredCourses.some(course => user.courseCodes?.includes(course.code)));
-  const totalStudents = filteredStudents?.length || 0;
+  let totalRecordsCount = 0
+  for (const session of filteredSessions) {
+    totalRecordsCount += session.records.length;
+  }
+  const totalStudents = totalRecordsCount
 
   useEffect(() => {
     if (!user) {
@@ -51,33 +55,37 @@ const InstructorDashboardScreen: React.FC = () => {
     router.push('/courses');
   };
 
+  const handleRecordsNavigation = () => {
+    router.push('/records');
+  };
+
   return (
     <AuthProvider>
       <CourseProvider>
         <SessionProvider>
-    <ScrollView style={styles.container}>
-      {showNewSessionForm ? (
-        <View style={styles.chartContainer}>
-          <Text style={styles.title}>Confirm New Session</Text>
-          <NewSessionForm selectedCourse={filteredCourses[0]} onClose={handleCloseNewSessionForm} isLoading={!courses} />
-        </View>
-      ) : (
-        <>
-          <Text style={styles.title}>Welcome {user?.name}</Text>
-          <View style={styles.cardContainer}>
-            <Card title="Sessions" value={sessionCount} icon='calendar-outline' action={handleSessionsNavigation} />
-            <Card title="Courses" value={totalCourses} icon='people-outline' action={handleCoursesNavigation} />
-            <Card title="Students" value={totalStudents} icon='book-outline' />
-            <Card title="New Session" icon='add-outline' action={handleNewSession} />
-          </View>
+          <ScrollView style={styles.container}>
+            {showNewSessionForm ? (
+              <View style={styles.chartContainer}>
+                <Text style={styles.title}>Confirm New Session</Text>
+                <NewSessionForm selectedCourse={filteredCourses[0]} onClose={handleCloseNewSessionForm} isLoading={!courses} />
+              </View>
+            ) : (
+              <>
+                <Text style={styles.title}>Welcome {user?.name}</Text>
+                <View style={styles.cardContainer}>
+                  <Card title="Sessions" value={sessionCount} icon='calendar-outline' action={handleSessionsNavigation} />
+                  <Card title="Courses" value={totalCourses} icon='people-outline' action={handleCoursesNavigation} />
+                  <Card title="Students" value={totalStudents} icon='book-outline' action={handleRecordsNavigation} />
+                  <Card title="New Session" icon='add-outline' action={handleNewSession} />
+                </View>
 
-          {/* Bar Chart component */}
-          <View style={styles.chartContainer}>
-            <Chart />
-          </View>
-        </>
-      )}
-    </ScrollView>
+                {/* Bar Chart component */}
+                <View style={styles.chartContainer}>
+                  <Chart />
+                </View>
+              </>
+            )}
+          </ScrollView>
 
         </SessionProvider>
       </CourseProvider>

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { Course } from '../types';
+import ip from "../ipAddress.json"
 
 interface CourseContextProps {
     courses: Course[];
@@ -10,7 +11,7 @@ interface CourseContextProps {
 
 const CourseContext = createContext<CourseContextProps | undefined>(undefined);
 
-const baseURL = 'http://192.168.1.179:5000/api';
+const baseURL = `http://${ip.ipAddress}:5000/api`;
 
 export const CourseProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [courses, setCourses] = useState<Course[]>([]);

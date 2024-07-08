@@ -2,8 +2,9 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 import { PersonalSettings, User } from '../types/index';
 import axios, { AxiosError } from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ip from "../ipAddress.json"
 
-const baseURL = 'http://192.168.1.179:5000/api';
+const baseURL = `http://${ip.ipAddress}:5000/api`;
 
 interface AuthResponse {
   user: User;

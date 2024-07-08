@@ -32,7 +32,7 @@ const SessionsScreen: React.FC = () => {
   };
 
   const handleMoreDetails = (sessionId: string) => {
-    router.navigate({ pathname: '/instructor/records', params: { sessionId: sessionId } });
+    router.navigate({ pathname: '/records', params: { sessionId: sessionId } });
   };
 
   return (

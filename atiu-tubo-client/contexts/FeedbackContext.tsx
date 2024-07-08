@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import axios from 'axios';
 import { Feedback } from '@/types';
+import ip from "../ipAddress.json"
 
 interface FeedbackContextProps {
     feedbacks: Feedback[];
@@ -14,7 +15,7 @@ interface FeedbackContextProps {
 
 const FeedbackContext = createContext<FeedbackContextProps | undefined>(undefined);
 
-const baseURL = 'http://192.168.1.179:5000/api/main'; // Adjust as per your backend API base URL
+const baseURL = `http://${ip.ipAddress}:5000/api/main`; // Adjust as per your backend API base URL
 
 interface SubmitFeedbackParams {
     userID: string | undefined;
